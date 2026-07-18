@@ -396,5 +396,21 @@
     }));
   }
 
+  /* WhatsApp float: notification + tip on every page load */
+  const waFloat = document.querySelector('[data-wa-float]');
+  if (waFloat) {
+    const showNotify = () => {
+      waFloat.classList.add('is-notified', 'is-tip-open');
+    };
+    const hideTip = () => {
+      waFloat.classList.remove('is-tip-open');
+    };
+    window.setTimeout(showNotify, 600);
+    window.setTimeout(hideTip, 6500);
+    waFloat.addEventListener('click', () => {
+      waFloat.classList.remove('is-notified', 'is-tip-open');
+    });
+  }
+
 })();
 

@@ -18,7 +18,7 @@ return [
     'hours' => 'Ежедневно 10:00 — 00:00',
     'hours_weekdays' => 'Пн–Чт: 10:00 — 00:00',
     'hours_weekend' => 'Пт–Вс: 10:00 — 00:00',
-    'whatsapp' => 'https://wa.me/992989860007',
+    'whatsapp' => 'https://wa.me/992100944545',
     'instagram' => 'https://instagram.com/sayoh_chaykhana',
     'facebook' => 'https://facebook.com/',
     'tiktok' => 'https://tiktok.com/',

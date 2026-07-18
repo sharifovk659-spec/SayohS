@@ -43,7 +43,6 @@ body {
 .checkout-summary,
 .order-success-panel,
 .contact-card,
-.site-footer,
 .flash > .container,
 .login-card,
 .about-home-copy,
@@ -232,16 +231,36 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.55);
 }
 
-/* Footer glossy tray */
+/* Footer — solid dark (readable text, no glass wash) */
 .site-footer {
   margin-top: var(--space-7);
   border-radius: clamp(28px, 4vw, 40px) clamp(28px, 4vw, 40px) 0 0;
   padding-top: var(--space-7);
+  background: #1a120c !important;
+  border: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  color: rgba(255, 253, 249, 0.88);
+}
+
+.site-footer .footer-title,
+.site-footer .footer-text,
+.site-footer .footer-contacts,
+.site-footer .footer-contacts a,
+.site-footer .footer-bottom-inner,
+.site-footer .footer-legal a {
+  color: rgba(255, 253, 249, 0.82);
+}
+
+.site-footer .footer-contacts a:hover,
+.site-footer .footer-legal a:hover {
+  color: #e8c97a;
 }
 
 .footer-bottom {
-  background: transparent;
-  border-top: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(0, 0, 0, 0.22);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 /* Dish detail glossy frame */
