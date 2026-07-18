@@ -210,7 +210,7 @@ svg {
 
 @media (max-width: 640px) {
   .container {
-    padding-inline: 1rem;
+    padding-inline: 0.9rem;
   }
 
   .section {
@@ -218,37 +218,23 @@ svg {
   }
 
   .hero--premium {
-    padding-top: 0.5rem;
+    padding-top: 0.25rem;
   }
 
   .hero-glass {
-    border-radius: 22px;
-  }
-
-  .hero-decor__pepper--r,
-  .hero-decor__pepper--br,
-  .hero-stage-pepper {
-    width: clamp(70px, 22vw, 120px);
+    border-radius: 20px;
   }
 
   .hero-stage {
-    min-height: 300px;
+    min-height: 0;
   }
 
   .hero-plate {
-    width: clamp(230px, 70vw, 360px);
+    width: min(72vw, 280px);
   }
 
   .hero-fresh-card {
-    max-width: min(200px, 68vw);
-    padding: 0.55rem 0.65rem;
-  }
-
-  .hero-fresh-copy span {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    display: none;
   }
 
   .cart-item-card {
@@ -283,6 +269,13 @@ svg {
     max-height: min(70vh, 520px);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+  }
+
+  .brand-logo,
+  .site-header--compact .brand-logo {
+    width: 48px;
+    height: 48px;
+    padding: 2px;
   }
 }
 

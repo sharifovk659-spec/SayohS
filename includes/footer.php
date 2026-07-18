@@ -58,11 +58,11 @@ $socialIconSvg = static function (string $icon): string {
 $waNumber = '100944545';
 $waHref = 'https://wa.me/992' . $waNumber;
 $waTips = [
-    'Напишите нам в WhatsApp',
-    'Бронь стола за 1 минуту',
-    'Доставка — спросите здесь',
-    'Есть вопросы? Мы онлайн',
-    'Закажите через WhatsApp',
+    'Напишите нам',
+    'Бронь за 1 минуту',
+    'Доставка — сюда',
+    'Мы онлайн',
+    'Заказ в WhatsApp',
 ];
 $waTip = $waTips[array_rand($waTips)];
 
