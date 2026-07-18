@@ -1,0 +1,29 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /actions/
+Disallow: /config/
+Disallow: /database/
+Disallow: /storage/
+Disallow: /includes/
+Disallow: /handlers/
+Disallow: /scripts/
+Disallow: /sql/
+Disallow: /account/
+Disallow: /api/
+
+User-agent: Googlebot
+Allow: /
+Disallow: /admin/
+Disallow: /actions/
+Disallow: /config/
+Disallow: /database/
+Disallow: /storage/
+Disallow: /includes/
+Disallow: /handlers/
+Disallow: /scripts/
+Disallow: /sql/
+Disallow: /account/
+Disallow: /api/
+
+Sitemap: https://aroma.inovaauto.com/sitemap.php

@@ -1,0 +1,828 @@
+/* ========================================
+   Aroma Home — premium glass layout
+   Compact header + hero with leaves
+   ======================================== */
+
+:root {
+  --header-h: 84px;
+  --glass: rgba(255, 253, 249, 0.72);
+  --glass-strong: rgba(255, 253, 249, 0.88);
+  --glass-border: rgba(255, 255, 255, 0.65);
+  --leaf-shadow: drop-shadow(0 10px 18px rgba(44, 33, 24, 0.12));
+}
+
+/* ---- Compact header ---- */
+.site-header--compact {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(247, 243, 236, 0.78);
+}
+
+.site-header--compact .brand-logo {
+  width: 64px;
+  height: 64px;
+  padding: 3px;
+}
+
+.site-header--compact .header-inner {
+  min-height: var(--header-h);
+  gap: 0.75rem;
+}
+
+.site-header--compact .brand-name {
+  font-size: 1.28rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.site-header--compact .brand-tag {
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+}
+
+.site-header--compact .nav-desktop {
+  gap: 0.1rem;
+}
+
+.site-header--compact .nav-desktop a {
+  min-height: 40px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.9rem;
+  background: transparent;
+  border-radius: 0;
+  position: relative;
+}
+
+.site-header--compact .nav-desktop a:hover,
+.site-header--compact .nav-desktop a.is-active {
+  background: transparent;
+  color: var(--color-brown);
+}
+
+.site-header--compact .nav-desktop a.is-active::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0.2rem;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  transform: translateX(-50%);
+}
+
+.site-header--compact .header-actions {
+  gap: 0.35rem;
+}
+
+.site-header--compact .header-icon-link,
+.site-header--compact .menu-toggle {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+}
+
+.site-header--compact .header-search {
+  display: none;
+}
+
+.header-cta--call {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 40px;
+  padding: 0.45rem 0.95rem;
+  font-size: 0.88rem;
+  border-radius: 999px;
+}
+
+.header-cta--call svg {
+  flex-shrink: 0;
+}
+
+.mobile-call {
+  margin-top: 0.5rem;
+  font-weight: 700;
+  color: var(--color-gold-deep) !important;
+}
+
+/* ---- Home ambient ---- */
+.page-home {
+  background:
+    radial-gradient(ellipse 60% 45% at 85% 12%, rgba(255, 170, 110, 0.22), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 10% 8%, rgba(184, 146, 74, 0.12), transparent 55%),
+    linear-gradient(180deg, #f7f3ec 0%, #fffdf9 38%, #efe6d8 100%);
+  background-attachment: scroll;
+}
+
+.page-home .section {
+  padding: clamp(2.5rem, 5vw, 4.5rem) 0;
+}
+
+/* ---- Hero premium ---- */
+.hero--premium {
+  position: relative;
+  padding: clamp(0.75rem, 2vw, 1.5rem) 0 clamp(1.5rem, 4vw, 3rem);
+  overflow: hidden;
+}
+
+.hero-ambient {
+  position: absolute;
+  inset: -12% -8% auto;
+  height: 85%;
+  background:
+    radial-gradient(circle at 78% 42%, rgba(255, 140, 90, 0.32), transparent 44%),
+    radial-gradient(circle at 92% 18%, rgba(255, 200, 140, 0.22), transparent 36%),
+    radial-gradient(circle at 12% 20%, rgba(184, 146, 74, 0.1), transparent 40%);
+  pointer-events: none;
+  filter: blur(2px);
+}
+
+.hero-layout {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(280px, 0.78fr) minmax(0, 1.22fr);
+  gap: clamp(0.5rem, 2vw, 1.25rem);
+  align-items: center;
+}
+
+.hero-glass {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: clamp(24px, 3vw, 36px);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  padding: clamp(1.5rem, 3.5vw, 2.75rem);
+}
+
+.hero-glass .eyebrow {
+  margin-bottom: 0.75rem;
+  font-size: calc(0.78rem + 10px);
+}
+
+.hero--premium .hero-brand {
+  font-size: calc(clamp(2.6rem, 5.8vw, 4.4rem) + 10px);
+  line-height: 0.98;
+  margin-bottom: 1.05rem;
+  max-width: 12ch;
+  position: relative;
+  padding-bottom: 0.55rem;
+}
+
+.hero--premium .hero-brand::after {
+  content: "";
+  display: block;
+  width: min(7.5rem, 42%);
+  height: 2px;
+  margin-top: 0.7rem;
+  background: linear-gradient(90deg, var(--color-gold), rgba(193, 154, 91, 0.25));
+  border-radius: 2px;
+}
+
+.hero--premium .hero-text {
+  max-width: 40ch;
+  margin-bottom: 1.5rem;
+  font-size: calc(1.02rem + 10px);
+  line-height: 1.45;
+}
+
+.hero--premium .hero-actions {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.hero--premium .hero-actions .btn {
+  flex: 0 1 auto;
+  width: auto;
+  white-space: nowrap;
+  font-size: 0.92rem;
+  padding-inline: 1rem;
+}
+
+.btn-with-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.hero-social-proof {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-top: 1.6rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.hero-avatars {
+  display: flex;
+}
+
+.hero-avatars span {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  margin-left: -10px;
+  background:
+    radial-gradient(circle at 30% 30%, #f0d7b0, #b8924a 70%);
+}
+
+.hero-avatars span:first-child {
+  margin-left: 0;
+  background: radial-gradient(circle at 30% 30%, #efe6d8, #8a7360 70%);
+}
+
+.hero-avatars span:nth-child(2) {
+  background: radial-gradient(circle at 30% 30%, #f7e7c8, #9a7635 70%);
+}
+
+.hero-proof-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  line-height: 1.25;
+}
+
+.hero-proof-text strong {
+  font-size: 0.92rem;
+}
+
+.hero-proof-text span {
+  color: var(--color-brown-muted);
+  font-size: 0.82rem;
+}
+
+.hero-stars {
+  color: var(--color-gold-deep) !important;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem !important;
+  line-height: 1;
+}
+
+/* Floating decor — corners + around the plate like the mock */
+.hero-decor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.hero-decor__img {
+  position: absolute;
+  object-fit: contain;
+  filter: drop-shadow(0 14px 22px rgba(44, 33, 24, 0.16));
+  user-select: none;
+  animation: leafFloat 8s ease-in-out infinite;
+}
+
+.hero-decor__basil--tl {
+  width: clamp(100px, 13vw, 180px);
+  top: -1%;
+  left: -1%;
+  transform: rotate(-26deg);
+  opacity: 0.95;
+  animation-duration: 7.5s;
+  z-index: 3;
+}
+
+.hero-decor__leaf--tr {
+  width: clamp(140px, 17vw, 240px);
+  top: -3%;
+  right: 0;
+  transform: rotate(14deg);
+  animation-duration: 9s;
+  animation-direction: reverse;
+}
+
+.hero-decor__pepper--r {
+  width: clamp(140px, 16vw, 220px);
+  top: 12%;
+  right: 10%;
+  z-index: 3;
+  opacity: 0.98;
+  animation: none;
+}
+
+.hero-decor__pepper--br {
+  width: clamp(80px, 11vw, 140px);
+  right: 14%;
+  bottom: 22%;
+  z-index: 3;
+  transform: rotate(8deg);
+  animation: none;
+}
+
+.hero-decor__leaf--bl {
+  width: clamp(110px, 14vw, 190px);
+  left: 2%;
+  bottom: -2%;
+  transform: rotate(-34deg) scaleX(-1);
+  animation-duration: 10s;
+}
+
+.hero-decor__basil--br {
+  display: none;
+}
+
+/* Hero stage + large plate (mock proportions) */
+.hero-stage {
+  position: relative;
+  min-height: clamp(460px, 58vw, 680px);
+  display: grid;
+  place-items: center;
+  z-index: 1;
+  margin-right: clamp(-1rem, -3vw, -2rem);
+}
+
+.hero-stage-leaf,
+.hero-stage-pepper {
+  position: absolute;
+  z-index: 3;
+  pointer-events: none;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 18px rgba(44, 33, 24, 0.18));
+  user-select: none;
+}
+
+.hero-stage-leaf--1 {
+  width: clamp(120px, 15vw, 200px);
+  left: -8%;
+  top: 6%;
+  transform: rotate(-16deg);
+  animation: leafFloat 7s ease-in-out infinite;
+}
+
+.hero-stage-leaf--2 {
+  width: clamp(100px, 13vw, 170px);
+  right: 2%;
+  top: -2%;
+  transform: rotate(22deg);
+  animation: leafFloat 8.5s ease-in-out infinite reverse;
+}
+
+.hero-stage-pepper {
+  width: clamp(110px, 13vw, 170px);
+  right: 8%;
+  top: 8%;
+  z-index: 3;
+}
+
+.hero-plate {
+  width: clamp(315px, 39vw, 585px);
+  max-width: none;
+  position: relative;
+  z-index: 2;
+  background: transparent;
+  border-radius: 0;
+  overflow: visible;
+  box-shadow: none;
+  aspect-ratio: 1;
+  justify-self: center;
+}
+
+.hero-plate img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 34px 50px rgba(44, 33, 24, 0.26));
+}
+
+.hero-fresh-card {
+  position: absolute;
+  right: 6%;
+  bottom: 10%;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  max-width: 250px;
+  padding: 0.9rem 1.05rem;
+  border-radius: 18px;
+  background: var(--glass-strong);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-soft);
+  color: var(--color-brown);
+}
+
+.hero-fresh-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(145deg, #d4b06e, #b8924a);
+  color: #fff;
+  box-shadow: 0 8px 16px rgba(184, 146, 74, 0.35);
+}
+
+.hero-fresh-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  line-height: 1.25;
+}
+
+.hero-fresh-copy strong {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.hero-fresh-copy span {
+  font-size: 0.78rem;
+  color: var(--color-brown-muted);
+  font-weight: 500;
+}
+
+@keyframes leafFloat {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-decor__img,
+  .hero-stage-leaf {
+    animation: none !important;
+  }
+}
+
+/* ---- Categories glass panel ---- */
+.page-home .categories-section .container {
+  position: relative;
+}
+
+.page-home .categories-slider {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 28px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: var(--shadow-soft);
+  padding: 1.25rem 1rem 1.5rem;
+  overflow: hidden;
+}
+
+.page-home .categories-viewport {
+  overflow: hidden;
+  width: 100%;
+}
+
+.page-home .categories-track--marquee {
+  display: flex;
+  width: max-content;
+  gap: 1rem;
+  animation: categoriesMarquee 28s linear infinite;
+  will-change: transform;
+}
+
+.page-home .categories-slider--marquee:hover .categories-track--marquee {
+  animation-play-state: paused;
+}
+
+.page-home .categories-nav {
+  top: -3.2rem;
+}
+
+.page-home .category-card {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  min-width: 138px;
+  padding: 0.35rem;
+  flex: 0 0 auto;
+}
+
+.page-home .category-card-media {
+  width: 102px;
+  height: 102px;
+  border-radius: 50%;
+  margin: 0 auto 0.65rem;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(44, 33, 24, 0.08);
+  border: 3px solid rgba(255, 255, 255, 0.9);
+}
+
+.page-home .category-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.page-home .category-card-name {
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.98rem;
+}
+
+.page-home .category-card-arrow {
+  margin: 0.45rem auto 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(184, 146, 74, 0.12);
+  color: var(--color-gold-deep);
+}
+
+@keyframes categoriesMarquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-home .categories-track--marquee {
+    animation: none;
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ---- About / gallery / reservation polish ---- */
+.page-home .about-home {
+  gap: clamp(1.5rem, 4vw, 3rem);
+}
+
+.page-home .about-home-media {
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.page-home .video-play-btn {
+  width: 72px;
+  height: 72px;
+  background: rgba(255, 253, 249, 0.92);
+  box-shadow: var(--shadow-soft);
+}
+
+.page-home .gallery-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.85rem;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 28px;
+  padding: 1rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.page-home .gallery-preview-item {
+  border-radius: 18px;
+  overflow: hidden;
+  margin: 0;
+  aspect-ratio: 4 / 5;
+}
+
+.page-home .gallery-preview-item figcaption {
+  display: none;
+}
+
+.page-home .reservation-panel {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 28px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 1.25rem 1.25rem 1.4rem;
+  position: relative;
+}
+
+.page-home .reservation-form--compact .form-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) auto;
+  gap: 0.75rem;
+  align-items: end;
+}
+
+.page-home .reservation-form--compact .form-privacy-compact {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.page-home .reservation-form--compact .form-privacy-compact .checkbox-label {
+  font-size: 0.82rem;
+  color: var(--color-brown-muted);
+}
+
+.page-home .reservation-form--compact .form-actions {
+  margin: 0;
+  grid-column: auto;
+}
+
+.page-home .reservation-form--compact .form-actions .btn {
+  white-space: nowrap;
+  min-height: 48px;
+}
+
+.page-home .reservation-panel::after {
+  content: "";
+  position: absolute;
+  right: -8px;
+  bottom: -18px;
+  width: 86px;
+  height: 86px;
+  background: url("../images/decor/leaf-2.svg") center / contain no-repeat;
+  filter: var(--leaf-shadow);
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.page-home .popular-dishes-section .dishes-grid {
+  gap: 1rem;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 1100px) {
+  .hero-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-stage {
+    order: -1;
+    min-height: 400px;
+    margin-right: 0;
+  }
+
+  .hero-plate {
+    width: clamp(240px, 61.5vw, 420px);
+  }
+
+  .hero-stage-leaf--1 {
+    left: -2%;
+  }
+
+  .hero-decor__basil--tl {
+    left: 0;
+    top: 0;
+    opacity: 0.85;
+  }
+
+  .hero-fresh-card {
+    bottom: 2%;
+    right: 2%;
+    max-width: 220px;
+  }
+
+  .page-home .gallery-preview-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .page-home .reservation-form--compact .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .page-home .reservation-form--compact .form-actions {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 900px) {
+  .site-header--compact .nav-desktop {
+    display: none;
+  }
+
+  .site-header--compact .menu-toggle {
+    display: grid;
+  }
+
+  .site-header--compact .header-text-link,
+  .site-header--compact .header-user-name {
+    display: none;
+  }
+
+  .header-cta--call span {
+    display: none;
+  }
+
+  .header-cta--call {
+    padding: 0.45rem 0.7rem;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --header-h: 72px;
+  }
+
+  .site-header--compact .brand-logo {
+    width: 56px;
+    height: 56px;
+    padding: 3px;
+  }
+
+  .hero-glass {
+    padding: 1.25rem 1.15rem 1.4rem;
+  }
+
+  .hero--premium .hero-brand {
+    font-size: calc(clamp(2rem, 9vw, 2.6rem) + 6px);
+    max-width: none;
+  }
+
+  .hero--premium .hero-text {
+    font-size: 0.95rem;
+    line-height: 1.45;
+  }
+
+  .hero--premium .hero-actions {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 0.65rem;
+    width: 100%;
+  }
+
+  .hero--premium .hero-actions .btn {
+    width: 100%;
+    flex: none;
+    min-width: 0;
+    min-height: 48px;
+    padding-inline: 1rem;
+    font-size: 0.95rem;
+    justify-content: center;
+  }
+
+  .hero-fresh-card {
+    bottom: 2%;
+    right: 0;
+    font-size: 0.8rem;
+    padding: 0.65rem 0.75rem;
+    max-width: 190px;
+  }
+
+  .hero-fresh-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .hero-decor__pepper--r,
+  .hero-stage-leaf--2 {
+    opacity: 0.65;
+  }
+
+  .hero-decor__basil--br {
+    display: none;
+  }
+
+  .page-home .gallery-preview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .page-home .reservation-form--compact .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page-home .reservation-panel::after {
+    width: 64px;
+    height: 64px;
+    right: 4px;
+    bottom: -14px;
+  }
+
+  .site-header--compact .lang-switch {
+    display: none;
+  }
+}
+
+@media (max-width: 390px) {
+  .hero--premium .hero-actions {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+  }
+
+  .hero--premium .hero-actions .btn {
+    width: 100%;
+    justify-content: center;
+    font-size: 0.92rem;
+    padding-inline: 1rem;
+    min-height: 48px;
+  }
+
+  .hero-social-proof {
+    flex-wrap: wrap;
+  }
+}
+
+/* Prevent horizontal scroll from leaves */
+.hero--premium,
+.page-home {
+  overflow-x: clip;
+}

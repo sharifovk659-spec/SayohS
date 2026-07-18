@@ -1,0 +1,43 @@
+# Secrets & local config
+config/database.php
+.env
+.env.*
+deploy.local.json
+deploy.json
+*.local.json
+
+# Runtime / uploads (keep brand assets in assets/images/brand)
+storage/logs/*
+!storage/logs/.gitkeep
+storage/cache/*
+!storage/cache/.gitkeep
+uploads/dishes/*
+uploads/categories/*
+uploads/gallery/*
+uploads/settings/*
+uploads/pages/*
+!uploads/**/.gitkeep
+!uploads/.htaccess
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.tmp
+
+# Dependencies / build
+/vendor/
+/node_modules/
+.vercel
+
+# Local deploy archives
+*.zip
+
+# Backups & local reports
+storage/backups/
+storage/deploy-last-report.json
+scripts/_*.py
+database/_*.php
+database/reimport_seed_utf8.php

@@ -1,0 +1,57 @@
+Options -Indexes
+AddDefaultCharset UTF-8
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Local XAMPP: project lives under /Restarant/
+  <If "%{REQUEST_URI} =~ m#^/Restarant/#">
+    RewriteBase /Restarant/
+    ErrorDocument 404 /Restarant/404.php
+  </If>
+
+  # Production (Hostinger subdomain root): https://aroma.inovaauto.com/
+  <Else>
+    RewriteBase /
+    ErrorDocument 404 /404.php
+  </Else>
+
+  # Force HTTPS for production subdomain
+  RewriteCond %{HTTP_HOST} ^(www\.)?aroma\.inovaauto\.com$ [NC]
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+  RewriteRule ^ https://aroma.inovaauto.com%{REQUEST_URI} [L,R=301]
+
+  RewriteRule ^(config|database|storage|includes|sql|components|scripts|handlers)/ - [F,L]
+  RewriteRule ^storage/ - [F,L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+  Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml application/javascript application/json image/svg+xml
+</IfModule>
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css "access plus 1 day"
+  ExpiresByType application/javascript "access plus 1 day"
+  ExpiresByType image/jpeg "access plus 30 days"
+  ExpiresByType image/png "access plus 30 days"
+  ExpiresByType image/webp "access plus 30 days"
+  ExpiresByType image/svg+xml "access plus 30 days"
+  ExpiresByType image/x-icon "access plus 30 days"
+  ExpiresByType font/woff2 "access plus 30 days"
+</IfModule>
+
+# Deny access to hidden / env files
+<FilesMatch "(^\.env|^\.git|composer\.(json|lock)|package(-lock)?\.json)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+</FilesMatch>

@@ -1,0 +1,22 @@
+{
+  "_comment": "Нусха кунед ба deploy.local.json ва танҳо паролҳоро пур кунед. deploy.local.json ба Git намеравад.",
+  "ssh": {
+    "host": "45.84.204.68",
+    "port": 65002,
+    "username": "u417315406",
+    "password": "PASTE_SSH_PASSWORD_HERE",
+    "likely_docroot": "/home/u417315406/domains/inovaauto.com/public_html/aroma"
+  },
+  "mysql": {
+    "host": "localhost",
+    "port": 3306,
+    "database": "u417315406_aroma",
+    "username": "u417315406_aroma",
+    "password": "PASTE_MYSQL_PASSWORD_HERE"
+  },
+  "site_url": "https://aroma.inovaauto.com",
+  "admin": {
+    "email": "sharifovk659@gmail.com",
+    "name": "Komron Sharifov"
+  }
+}
