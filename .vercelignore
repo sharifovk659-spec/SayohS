@@ -10,7 +10,6 @@ storage/backups/
 .env.*
 deploy.json
 deploy.local.json
-Aroma-Restarant.zip
+.git/
 scripts/_*.py
 database/_*.php
-.git/

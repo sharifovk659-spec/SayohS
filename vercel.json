@@ -1,13 +1,35 @@
 {
-  "functions": {
-    "api/index.php": {
-      "runtime": "vercel-php@0.7.4",
-      "memory": 1024,
-      "maxDuration": 30,
-      "includeFiles": "{*.php,admin/**,account/**,actions/**,api/**,components/**,config/**,includes/**,lang/**,handlers/**,assets/**,uploads/**,database/**,sql/**,storage/**,.htaccess}"
-    }
-  },
-  "rewrites": [
-    { "source": "/((?!assets/|uploads/).*)", "destination": "/api/index.php" }
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/index.php",
+      "use": "vercel-php@0.7.4",
+      "config": {
+        "includeFiles": [
+          "*.php",
+          "admin/**",
+          "account/**",
+          "actions/**",
+          "api/**",
+          "components/**",
+          "config/**",
+          "includes/**",
+          "lang/**",
+          "handlers/**",
+          "database/**",
+          "sql/**",
+          "assets/**",
+          "uploads/**",
+          "storage/**"
+        ]
+      }
+    },
+    { "src": "assets/**", "use": "@vercel/static" },
+    { "src": "uploads/**", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/assets/(.*)", "dest": "/assets/$1" },
+    { "src": "/uploads/(.*)", "dest": "/uploads/$1" },
+    { "src": "/(.*)", "dest": "/api/index.php" }
   ]
 }

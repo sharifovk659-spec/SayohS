@@ -32,11 +32,16 @@ mysql -u root --default-character-set=utf8mb4 aroma_restaurant < database/seed.s
 
 Не используйте PowerShell `Get-Content | mysql` для seed.
 
+## Если «Загрузка» вместо сайта
+
+См. [IMPORT.md](IMPORT.md) — не открывайте `index.php` напрямую.
+Локально: запустите `start-local.bat` → http://127.0.0.1:8080/
+
 ## Деплой
 
 - **GitHub** — готово для push/import
-- **Хостинг** — Hostinger / любой PHP+MySQL ([DEPLOY_HOSTINGER.md](DEPLOY_HOSTINGER.md))
-- **Vercel** — не подходит для этого PHP+MySQL проекта
+- **Vercel** — нужен `vercel.json` (уже в репо); без MySQL сайт на fallback
+- **Hostinger** — PHP+MySQL ([DEPLOY_HOSTINGER.md](DEPLOY_HOSTINGER.md))
 
 ## Админка
 
