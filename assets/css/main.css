@@ -3013,6 +3013,7 @@ body.nav-open {
   display: grid;
   place-items: center;
   line-height: 0;
+  animation: wa-float-spin 4s linear infinite;
 }
 
 .wa-float__icon svg {
@@ -3085,6 +3086,11 @@ body.nav-open {
   50% { box-shadow: 0 12px 34px rgba(37, 211, 102, 0.55); transform: scale(1.04); }
 }
 
+@keyframes wa-float-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 @media (max-width: 640px) {
   .wa-float {
     right: 0.85rem;
@@ -3110,7 +3116,8 @@ body.nav-open {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .wa-float {
+  .wa-float,
+  .wa-float__icon {
     animation: none;
   }
 }

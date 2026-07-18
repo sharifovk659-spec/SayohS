@@ -1,0 +1,16 @@
+.vercel
+.vercel/
+node_modules/
+vendor/
+*.zip
+storage/logs/*
+storage/cache/*
+storage/backups/
+.env
+.env.*
+deploy.json
+deploy.local.json
+Aroma-Restarant.zip
+scripts/_*.py
+database/_*.php
+.git/

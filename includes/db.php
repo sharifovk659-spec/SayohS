@@ -2,6 +2,56 @@
 
 declare(strict_types=1);
 
+/**
+ * Load DB config: local database.php, else example + environment variables (Vercel).
+ *
+ * @return array{host:string,port:string,dbname:string,username:string,password:string,charset:string}
+ */
+function db_config(): array
+{
+    static $config = null;
+    if (is_array($config)) {
+        return $config;
+    }
+
+    $local = __DIR__ . '/../config/database.php';
+    $example = __DIR__ . '/../config/database.example.php';
+
+    if (is_file($local)) {
+        /** @var array $config */
+        $config = require $local;
+    } elseif (is_file($example)) {
+        /** @var array $config */
+        $config = require $example;
+    } else {
+        $config = [
+            'host' => '127.0.0.1',
+            'port' => '3306',
+            'dbname' => 'aroma_restaurant',
+            'username' => 'root',
+            'password' => '',
+            'charset' => 'utf8mb4',
+        ];
+    }
+
+    $envMap = [
+        'host' => 'DB_HOST',
+        'port' => 'DB_PORT',
+        'dbname' => 'DB_NAME',
+        'username' => 'DB_USER',
+        'password' => 'DB_PASS',
+        'charset' => 'DB_CHARSET',
+    ];
+    foreach ($envMap as $key => $env) {
+        $val = getenv($env);
+        if ($val !== false && $val !== '') {
+            $config[$key] = $val;
+        }
+    }
+
+    return $config;
+}
+
 function storage_log(string $message): void
 {
     $dir = __DIR__ . '/../storage/logs';
@@ -19,17 +69,22 @@ function db_port_open(): bool
         return $open;
     }
 
-    $config = require __DIR__ . '/../config/database.php';
-    $host = $config['host'] === 'localhost' ? '127.0.0.1' : $config['host'];
-    $errno = 0;
-    $errstr = '';
-    $socket = @fsockopen($host, (int) $config['port'], $errno, $errstr, 1);
-    if (is_resource($socket)) {
-        fclose($socket);
-        $open = true;
-    } else {
+    try {
+        $config = db_config();
+        $host = $config['host'] === 'localhost' ? '127.0.0.1' : (string) $config['host'];
+        $errno = 0;
+        $errstr = '';
+        $socket = @fsockopen($host, (int) $config['port'], $errno, $errstr, 1);
+        if (is_resource($socket)) {
+            fclose($socket);
+            $open = true;
+        } else {
+            $open = false;
+        }
+    } catch (Throwable $e) {
         $open = false;
     }
+
     return $open;
 }
 
@@ -47,7 +102,7 @@ function db(): PDO
         throw new RuntimeException('База данных недоступна.');
     }
 
-    $config = require __DIR__ . '/../config/database.php';
+    $config = db_config();
     $dsn = sprintf(
         'mysql:host=%s;port=%s;dbname=%s;charset=%s',
         $config['host'],
@@ -66,7 +121,7 @@ function db(): PDO
     }
 
     try {
-        $pdo = new PDO($dsn, $config['username'], $config['password'], $options);
+        $pdo = new PDO($dsn, (string) $config['username'], (string) $config['password'], $options);
         $pdo->exec("SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci");
     } catch (Throwable $e) {
         storage_log('DB connect failed: ' . $e->getMessage());
