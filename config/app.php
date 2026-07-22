@@ -33,4 +33,8 @@ return [
     'recaptcha_site_key' => '',
     'recaptcha_secret_key' => '',
     'recaptcha_min_score' => 0.4,
+
+    // Google Sign-In — or GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET
+    'google_client_id' => '',
+    'google_client_secret' => '',
 ];

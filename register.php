@@ -234,6 +234,11 @@ require __DIR__ . '/includes/header.php';
             </button>
           </div>
 
+          <?php
+          $from = 'register';
+          require __DIR__ . '/components/google-auth-button.php';
+          ?>
+
           <div class="form-group full auth-links">
             <p><?= e(__('already_have_account')) ?> <a href="<?= e(base_url('login.php')) ?>"><?= e(__('login_submit')) ?></a></p>
           </div>

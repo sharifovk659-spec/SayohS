@@ -143,6 +143,11 @@ require __DIR__ . '/includes/header.php';
             <button class="btn btn-primary btn-full" type="submit"><?= e(__('login_submit')) ?></button>
           </div>
 
+          <?php
+          $from = 'login';
+          require __DIR__ . '/components/google-auth-button.php';
+          ?>
+
           <div class="form-group full auth-links">
             <p><?= e(__('no_account')) ?> <a href="<?= e(base_url('register.php')) ?>"><?= e(__('register_submit')) ?></a></p>
           </div>

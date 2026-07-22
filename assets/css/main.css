@@ -1837,6 +1837,64 @@ body.modal-open { overflow: hidden; }
   color: #a33;
 }
 
+.auth-google {
+  width: 100%;
+  margin-top: 0.35rem;
+}
+
+.auth-google__divider {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 0.65rem;
+  margin: 0.35rem 0 0.75rem;
+  color: var(--color-brown-muted, #7a6554);
+  font-size: 0.8rem;
+}
+
+.auth-google__divider::before,
+.auth-google__divider::after {
+  content: '';
+  height: 1px;
+  background: rgba(92, 64, 42, 0.14);
+}
+
+.btn-google {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  width: 100%;
+  min-height: 48px;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(92, 64, 42, 0.16);
+  background: #fff;
+  color: #3c4043;
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(40, 24, 12, 0.05);
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-google:hover {
+  background: #f8f9fa;
+  border-color: rgba(92, 64, 42, 0.28);
+  transform: translateY(-1px);
+}
+
+.btn-google__icon {
+  display: grid;
+  place-items: center;
+  line-height: 0;
+  flex: 0 0 auto;
+}
+
+.btn-google__label {
+  line-height: 1.2;
+}
+
 .page-reservation .reservation-form .form-group input,
 .page-reservation .reservation-form .form-group select,
 .page-reservation .reservation-form .form-group textarea {

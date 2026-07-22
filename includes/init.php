@@ -7,6 +7,7 @@ require_once __DIR__ . '/i18n.php';
 require_once __DIR__ . '/translations.php';
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/recaptcha.php';
+require_once __DIR__ . '/google_oauth.php';
 require_once __DIR__ . '/favorites.php';
 require_once __DIR__ . '/cart.php';
 require_once __DIR__ . '/orders.php';
