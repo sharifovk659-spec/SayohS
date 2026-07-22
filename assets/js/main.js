@@ -319,25 +319,30 @@
   if (reduceMotion || !('IntersectionObserver' in window)) {
     revealItems.forEach((el) => el.classList.add('is-visible'));
   } else {
+    // Show immediately if already in (or near) viewport — avoids blank cart/checkout
+    revealItems.forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 1.1 && rect.bottom > -40) {
+        el.classList.add('is-visible');
+      }
+    });
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const el = entry.target;
-            const siblings = el.parentElement
-              ? Array.from(el.parentElement.querySelectorAll(':scope > [data-reveal]'))
-              : [];
-            const idx = Math.max(0, siblings.indexOf(el));
-            el.style.transitionDelay = `${Math.min(idx, 6) * 0.07}s`;
             el.classList.add('is-visible');
             observer.unobserve(el);
           }
         });
       },
-      { threshold: 0.1, rootMargin: '0px 0px -8% 0px' }
+      { threshold: 0.01, rootMargin: '40px 0px 40px 0px' }
     );
 
-    revealItems.forEach((el) => observer.observe(el));
+    revealItems.forEach((el) => {
+      if (!el.classList.contains('is-visible')) observer.observe(el);
+    });
   }
 
   /* Platform interactions */

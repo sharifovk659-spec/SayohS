@@ -180,11 +180,11 @@ svg {
   }
 
   .hero--premium {
-    padding-top: 0.25rem;
+    padding-top: 0.1rem;
   }
 
   .hero-glass {
-    border-radius: 20px;
+    border-radius: 16px;
   }
 
   .hero-stage {
@@ -192,7 +192,7 @@ svg {
   }
 
   .hero-plate {
-    width: min(72vw, 280px);
+    width: min(48vw, 170px);
   }
 
   .hero-fresh-card {
@@ -339,9 +339,9 @@ svg {
     width: auto;
     flex: 1 1 0;
     min-width: 0;
-    min-height: 42px;
-    font-size: 0.78rem;
-    padding-inline: 0.55rem;
+    min-height: 38px;
+    font-size: 0.7rem;
+    padding-inline: 0.45rem;
     justify-content: center;
     white-space: nowrap;
   }

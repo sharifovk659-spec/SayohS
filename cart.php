@@ -38,13 +38,12 @@ $maxQty = cart_max_qty();
 require __DIR__ . '/includes/header.php';
 ?>
 
-<section class="page-hero page-hero--cart">
+<section class="page-hero page-hero--cart page-hero--compact">
   <div class="container">
-    <div class="page-hero-inner" data-reveal>
-      <p class="eyebrow"><?= e(__('cart_title')) ?></p>
+    <div class="page-hero-inner">
       <h1><?= e(__('cart_title')) ?></h1>
       <?php if ($cart['count'] > 0): ?>
-        <p><?= (int) $cart['count'] ?> <?= e(__('qty')) ?></p>
+        <p class="cart-hero-meta"><?= (int) $cart['count'] ?> <?= e(__('qty')) ?></p>
       <?php endif; ?>
     </div>
   </div>
@@ -52,23 +51,23 @@ require __DIR__ . '/includes/header.php';
 
 <section class="section cart-section" data-cart-page>
   <div class="container">
-    <?php if ($cart['count'] <= 0): ?>
-      <div class="cart-empty" data-reveal>
+    <?php if ($cart['count'] <= 0 || $cart['items'] === []): ?>
+      <div class="cart-empty">
         <p class="cart-empty__text"><?= e(__('cart_empty')) ?></p>
         <a class="btn btn-primary" href="<?= e(base_url('menu.php')) ?>"><?= e(__('cart_continue')) ?></a>
       </div>
     <?php else: ?>
-      <div class="cart-layout" data-reveal>
+      <div class="cart-layout">
         <div class="cart-items" data-cart-items>
           <?php foreach ($cart['items'] as $item): ?>
             <?php
             $dish = $item['dish'] ?? [];
             $dishId = (int) $item['dish_id'];
-            $name = (string) ($dish['name'] ?? '');
+            $name = (string) ($dish['name'] ?? ('#' . $dishId));
             $slug = (string) ($dish['slug'] ?? '');
             $qty = (int) $item['quantity'];
             $image = dish_image_url($dish['image'] ?? null);
-            $detailUrl = base_url('dish.php?slug=' . rawurlencode($slug));
+            $detailUrl = $slug !== '' ? base_url('dish.php?slug=' . rawurlencode($slug)) : base_url('menu.php');
             ?>
             <article class="cart-item-card" data-cart-item data-dish-id="<?= $dishId ?>">
               <a class="cart-item-media" href="<?= e($detailUrl) ?>">
@@ -133,12 +132,12 @@ require __DIR__ . '/includes/header.php';
           </dl>
 
           <div class="cart-summary__actions">
-            <a class="btn btn-primary btn-full" href="<?= e(base_url('checkout.php')) ?>"><?= e(__('cart_checkout')) ?></a>
-            <a class="btn btn-outline btn-full" href="<?= e(base_url('menu.php')) ?>"><?= e(__('cart_continue')) ?></a>
+            <a class="btn btn-primary" href="<?= e(base_url('checkout.php')) ?>"><?= e(__('cart_checkout')) ?></a>
+            <a class="btn btn-outline" href="<?= e(base_url('menu.php')) ?>"><?= e(__('cart_continue')) ?></a>
             <form method="post" action="<?= e(base_url('cart.php')) ?>" class="cart-clear-form">
               <?= csrf_field() ?>
               <input type="hidden" name="action" value="clear">
-              <button class="btn btn-ghost btn-sm btn-full" type="submit"><?= e(__('btn_clear')) ?></button>
+              <button class="btn btn-ghost btn-sm" type="submit"><?= e(__('btn_clear')) ?></button>
             </form>
           </div>
         </aside>

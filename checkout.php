@@ -71,8 +71,7 @@ require __DIR__ . '/includes/header.php';
 
 <section class="page-hero page-hero--compact">
   <div class="container">
-    <div class="page-hero-inner" data-reveal>
-      <p class="eyebrow"><?= e(__('checkout_title')) ?></p>
+    <div class="page-hero-inner">
       <h1><?= e(__('checkout_title')) ?></h1>
     </div>
   </div>
@@ -80,7 +79,7 @@ require __DIR__ . '/includes/header.php';
 
 <section class="section checkout-section">
   <div class="container">
-    <div class="checkout-layout checkout-layout--compact" data-reveal>
+    <div class="checkout-layout checkout-layout--compact">
       <form class="checkout-form checkout-form--wow" method="post" action="<?= e(base_url('checkout.php')) ?>" novalidate data-checkout-form>
         <?= csrf_field() ?>
         <input type="hidden" name="idempotency_key" value="<?= e($idempotencyKey) ?>">
@@ -129,13 +128,18 @@ require __DIR__ . '/includes/header.php';
                        value="<?= e($defaults['address']) ?>" data-address-input>
                 <button
                   type="button"
-                  class="btn btn-outline btn-sm checkout-geo-btn"
+                  class="btn btn-outline checkout-geo-btn"
                   data-geo-btn
+                  aria-label="<?= e(__('checkout_geo')) ?>"
+                  title="<?= e(__('checkout_geo')) ?>"
                   data-geo-loading="<?= e(__('checkout_geo_loading')) ?>"
                   data-geo-ok="<?= e(__('checkout_geo_ok')) ?>"
                   data-geo-fail="<?= e(__('checkout_geo_fail')) ?>"
                 >
-                  <?= e(__('checkout_geo')) ?>
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 2.5c-3.6 0-6.5 2.9-6.5 6.5 0 4.6 6.5 12.5 6.5 12.5s6.5-7.9 6.5-12.5c0-3.6-2.9-6.5-6.5-6.5Z" stroke="currentColor" stroke-width="1.7"/>
+                    <circle cx="12" cy="9" r="2.4" stroke="currentColor" stroke-width="1.7"/>
+                  </svg>
                 </button>
               </div>
               <p class="checkout-geo-status" data-geo-status hidden></p>
