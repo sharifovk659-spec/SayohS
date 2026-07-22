@@ -28,4 +28,9 @@ return [
     'upload_max_mb' => 3,
     'about_video_url' => 'https://www.youtube.com/embed/ScMzIvxBSi4?rel=0',
     'per_page' => 8,
+
+    // Google reCAPTCHA v3 — set keys here or via RECAPTCHA_SITE_KEY / RECAPTCHA_SECRET_KEY
+    'recaptcha_site_key' => '',
+    'recaptcha_secret_key' => '',
+    'recaptcha_min_score' => 0.4,
 ];

@@ -1820,6 +1820,23 @@ body.modal-open { overflow: hidden; }
   margin-inline: auto;
 }
 
+.page-auth .reservation-panel.auth-panel {
+  grid-template-columns: 1fr;
+  max-width: 560px;
+  margin-inline: auto;
+}
+
+.recaptcha-hint {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--color-brown-muted, #7a6554);
+  line-height: 1.4;
+}
+
+.recaptcha-note.is-invalid .recaptcha-hint {
+  color: #a33;
+}
+
 .page-reservation .reservation-form .form-group input,
 .page-reservation .reservation-form .form-group select,
 .page-reservation .reservation-form .form-group textarea {

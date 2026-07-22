@@ -12,6 +12,8 @@ $pageTitle = __('register_title') . ' — ' . ($app['full_name'] ?? $app['name']
 $pageDescription = __('register_title');
 $bodyClass = 'page-auth page-register';
 $errors = form_errors();
+$captchaEnabled = recaptcha_enabled();
+$captchaSiteKey = recaptcha_site_key();
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     $input = [
@@ -29,8 +31,16 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         $errors['form'] = __('error_csrf');
     }
 
-    if (auth_rate_limited('register', 6, 900)) {
+    if ($errors === [] && auth_rate_limited('register', 6, 900)) {
         $errors['form'] = __('error_generic');
+    }
+
+    if ($errors === [] && $captchaEnabled) {
+        $captcha = recaptcha_verify($_POST['g-recaptcha-response'] ?? null, 'register');
+        if (!$captcha['ok']) {
+            $errors['form'] = __('error_captcha');
+            $errors['captcha'] = __('error_captcha');
+        }
     }
 
     if ($input['name'] === '' || mb_strlen($input['name']) > 120) {
@@ -58,7 +68,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     }
 
     if ($errors === [] && !db_available()) {
-        $errors['form'] = __('error_generic');
+        $errors['form'] = __('error_register_unavailable');
     }
 
     if ($errors === []) {
@@ -66,16 +76,22 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
             $stmt = db()->prepare('SELECT id FROM users WHERE email = ? LIMIT 1');
             $stmt->execute([$input['email']]);
             if ($stmt->fetchColumn()) {
-                $errors['form'] = __('error_generic');
+                $errors['email'] = __('error_email_taken');
+                $errors['form'] = __('error_email_taken');
             }
         } catch (Throwable $e) {
             storage_log('register check email: ' . $e->getMessage());
-            $errors['form'] = __('error_generic');
+            $errors['form'] = __('error_register_unavailable');
         }
     }
 
     if ($errors !== []) {
-        set_form_state($errors, $input);
+        set_form_state($errors, [
+            'name' => $input['name'],
+            'phone' => $input['phone'],
+            'email' => $input['email'],
+            'privacy' => $input['privacy'],
+        ]);
         flash('error', $errors['form'] ?? __('error_required'));
         redirect('register.php');
     }
@@ -119,8 +135,18 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         redirect(ltrim($target, '/'));
     } catch (Throwable $e) {
         storage_log('register: ' . $e->getMessage());
-        set_form_state(['form' => __('error_generic')], $input);
-        flash('error', __('error_generic'));
+        $msg = __('error_register_unavailable');
+        // Duplicate email race
+        if (str_contains(strtolower($e->getMessage()), 'duplicate') || str_contains(strtolower($e->getMessage()), 'unique')) {
+            $msg = __('error_email_taken');
+        }
+        set_form_state(['form' => $msg, 'email' => $msg], [
+            'name' => $input['name'],
+            'phone' => $input['phone'],
+            'email' => $input['email'],
+            'privacy' => $input['privacy'],
+        ]);
+        flash('error', $msg);
         redirect('register.php');
     }
 }
@@ -128,10 +154,9 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 require __DIR__ . '/includes/header.php';
 ?>
 
-<section class="page-hero">
+<section class="page-hero page-hero--compact">
   <div class="container">
-    <div class="page-hero-inner" data-reveal>
-      <p class="eyebrow"><?= e(__('register_title')) ?></p>
+    <div class="page-hero-inner">
       <h1><?= e(__('register_title')) ?></h1>
       <p><?= e(__('no_account')) ?> — <?= e(__('register_submit')) ?></p>
     </div>
@@ -140,9 +165,19 @@ require __DIR__ . '/includes/header.php';
 
 <section class="section">
   <div class="container">
-    <div class="reservation-panel auth-panel" data-reveal>
-      <form class="reservation-form" method="post" action="<?= e(base_url('register.php')) ?>" novalidate>
+    <div class="reservation-panel auth-panel">
+      <form
+        class="reservation-form"
+        method="post"
+        action="<?= e(base_url('register.php')) ?>"
+        novalidate
+        data-register-form
+        <?php if ($captchaEnabled): ?>
+          data-recaptcha-sitekey="<?= e($captchaSiteKey) ?>"
+        <?php endif; ?>
+      >
         <?= csrf_field() ?>
+        <input type="hidden" name="g-recaptcha-response" value="" data-recaptcha-token>
 
         <div class="form-grid">
           <div class="form-group<?= field_invalid('name', $errors) ?>">
@@ -155,7 +190,7 @@ require __DIR__ . '/includes/header.php';
           <div class="form-group<?= field_invalid('phone', $errors) ?>">
             <label for="reg-phone"><?= e(__('phone')) ?> *</label>
             <input type="tel" id="reg-phone" name="phone" required maxlength="30" autocomplete="tel"
-                   inputmode="tel" placeholder="+7 (___) ___-__-__" value="<?= e((string) old('phone')) ?>">
+                   inputmode="tel" placeholder="+992 __ ___ ____" value="<?= e((string) old('phone')) ?>">
             <?= field_error('phone', $errors) ?>
           </div>
 
@@ -186,8 +221,17 @@ require __DIR__ . '/includes/header.php';
             <?= field_error('privacy', $errors) ?>
           </div>
 
+          <?php if ($captchaEnabled): ?>
+            <div class="form-group full recaptcha-note<?= field_invalid('captcha', $errors) ?>">
+              <p class="recaptcha-hint"><?= e(__('recaptcha_hint')) ?></p>
+              <?= field_error('captcha', $errors) ?>
+            </div>
+          <?php endif; ?>
+
           <div class="form-group full form-actions">
-            <button class="btn btn-primary btn-full" type="submit"><?= e(__('register_submit')) ?></button>
+            <button class="btn btn-primary btn-full" type="submit" data-register-submit>
+              <?= e(__('register_submit')) ?>
+            </button>
           </div>
 
           <div class="form-group full auth-links">
@@ -198,5 +242,61 @@ require __DIR__ . '/includes/header.php';
     </div>
   </div>
 </section>
+
+<?php if ($captchaEnabled): ?>
+<script src="https://www.google.com/recaptcha/api.js?render=<?= e(rawurlencode($captchaSiteKey)) ?>"></script>
+<script>
+(() => {
+  const form = document.querySelector('[data-register-form]');
+  if (!form) return;
+
+  const siteKey = form.getAttribute('data-recaptcha-sitekey') || '';
+  const tokenInput = form.querySelector('[data-recaptcha-token]');
+  const submitBtn = form.querySelector('[data-register-submit]');
+  const failMsg = <?= json_encode(__('error_captcha'), JSON_UNESCAPED_UNICODE) ?>;
+  let submitting = false;
+
+  const whenReady = () => new Promise((resolve, reject) => {
+    let tries = 0;
+    const tick = () => {
+      if (window.grecaptcha && typeof window.grecaptcha.execute === 'function') {
+        if (typeof window.grecaptcha.ready === 'function') {
+          window.grecaptcha.ready(resolve);
+        } else {
+          resolve();
+        }
+        return;
+      }
+      tries += 1;
+      if (tries > 80) {
+        reject(new Error('recaptcha-timeout'));
+        return;
+      }
+      setTimeout(tick, 50);
+    };
+    tick();
+  });
+
+  form.addEventListener('submit', (event) => {
+    if (submitting || !siteKey || !tokenInput) return;
+    event.preventDefault();
+    if (submitBtn) submitBtn.disabled = true;
+
+    whenReady()
+      .then(() => window.grecaptcha.execute(siteKey, { action: 'register' }))
+      .then((token) => {
+        tokenInput.value = token || '';
+        submitting = true;
+        HTMLFormElement.prototype.submit.call(form);
+      })
+      .catch(() => {
+        if (submitBtn) submitBtn.disabled = false;
+        submitting = false;
+        alert(failMsg);
+      });
+  });
+})();
+</script>
+<?php endif; ?>
 
 <?php require __DIR__ . '/includes/footer.php'; ?>
