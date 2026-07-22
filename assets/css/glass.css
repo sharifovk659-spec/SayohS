@@ -287,6 +287,32 @@ body {
   justify-content: center;
 }
 
+@media (max-width: 768px) {
+  .gallery-filters,
+  .menu-filters.gallery-filters {
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0.55rem 0.65rem;
+    gap: 0.4rem;
+  }
+
+  .gallery-filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .gallery-filters .filter-chip,
+  .gallery-filters button {
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+    min-height: 40px;
+    padding: 0.45rem 0.9rem;
+    font-size: 0.86rem;
+  }
+}
+
 .chip,
 .filter-chip,
 .menu-filters a,
