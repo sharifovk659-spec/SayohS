@@ -31,7 +31,7 @@ $categories = $categories ?? [];
         </div>
       </div>
 
-      <div class="categories-nav">
+      <div class="categories-nav" hidden>
         <button type="button" class="slider-btn" data-cat-prev aria-label="<?= e(__('btn_back')) ?>">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
             <path d="M11 4 6 9l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>

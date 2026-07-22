@@ -527,5 +527,60 @@
     });
   }
 
+  /* Checkout: delivery toggle + geolocation address */
+  const checkoutForm = document.querySelector('[data-checkout-form]');
+  if (checkoutForm) {
+    const addressBlock = checkoutForm.querySelector('[data-address-block]');
+    const addressInput = checkoutForm.querySelector('[data-address-input]');
+    const geoBtn = checkoutForm.querySelector('[data-geo-btn]');
+    const geoStatus = checkoutForm.querySelector('[data-geo-status]');
+    const deliveryToggles = checkoutForm.querySelectorAll('[data-delivery-toggle]');
+
+    const syncDelivery = () => {
+      const selected = checkoutForm.querySelector('input[name="delivery_type"]:checked');
+      const isDelivery = !selected || selected.value === 'delivery';
+      if (addressBlock) addressBlock.classList.toggle('is-hidden', !isDelivery);
+      if (addressInput) addressInput.required = isDelivery;
+    };
+
+    deliveryToggles.forEach((el) => el.addEventListener('change', syncDelivery));
+    syncDelivery();
+
+    if (geoBtn && addressInput) {
+      geoBtn.addEventListener('click', () => {
+        if (!navigator.geolocation) {
+          if (geoStatus) {
+            geoStatus.hidden = false;
+            geoStatus.textContent = geoBtn.getAttribute('data-geo-fail') || '';
+          }
+          return;
+        }
+        if (geoStatus) {
+          geoStatus.hidden = false;
+          geoStatus.textContent = geoBtn.getAttribute('data-geo-loading') || '';
+        }
+        geoBtn.disabled = true;
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+          try {
+            const { latitude, longitude } = pos.coords;
+            const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(latitude)}&lon=${encodeURIComponent(longitude)}&accept-language=ru`;
+            const res = await fetch(url, { headers: { Accept: 'application/json' } });
+            const data = await res.json();
+            const addr = data && (data.display_name || '');
+            addressInput.value = addr || `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+            if (geoStatus) geoStatus.textContent = geoBtn.getAttribute('data-geo-ok') || '';
+          } catch (_) {
+            if (geoStatus) geoStatus.textContent = geoBtn.getAttribute('data-geo-fail') || '';
+          } finally {
+            geoBtn.disabled = false;
+          }
+        }, () => {
+          if (geoStatus) geoStatus.textContent = geoBtn.getAttribute('data-geo-fail') || '';
+          geoBtn.disabled = false;
+        }, { enableHighAccuracy: true, timeout: 12000 });
+      });
+    }
+  }
+
 })();
 

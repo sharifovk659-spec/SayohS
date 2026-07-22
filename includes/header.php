@@ -130,7 +130,7 @@ $phoneTel = $phoneHref !== '' ? 'tel:' . preg_replace('/[^\d+]/', '', $phoneHref
             <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
           </button>
           <div class="lang-switch-menu" data-lang-menu hidden role="listbox">
-            <?php foreach (['ru' => 'RU', 'en' => 'EN', 'de' => 'DE'] as $code => $label): ?>
+            <?php foreach (['ru' => 'RU', 'tg' => 'TG'] as $code => $label): ?>
               <a
                 class="lang-link<?= $lang === $code ? ' is-active' : '' ?>"
                 href="<?= e(lang_url($code)) ?>"
@@ -219,7 +219,7 @@ $phoneTel = $phoneHref !== '' ? 'tel:' . preg_replace('/[^\d+]/', '', $phoneHref
       </a>
     </nav>
     <div class="mobile-lang">
-      <?php foreach (['ru' => 'RU', 'en' => 'EN', 'de' => 'DE'] as $code => $label): ?>
+      <?php foreach (['ru' => 'RU', 'tg' => 'TG'] as $code => $label): ?>
         <a class="<?= $lang === $code ? 'is-active' : '' ?>" href="<?= e(lang_url($code)) ?>"><?= e($label) ?></a>
       <?php endforeach; ?>
     </div>

@@ -21,7 +21,6 @@ $idempotencyKey = (string) $_SESSION['checkout_idempotency'];
 $defaults = [
     'name' => (string) old('name', $user['name'] ?? ''),
     'phone' => (string) old('phone', $user['phone'] ?? ''),
-    'email' => (string) old('email', $user['email'] ?? ''),
     'address' => (string) old('address', ''),
     'landmark' => (string) old('landmark', ''),
     'comment' => (string) old('comment', ''),
@@ -38,7 +37,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     $input = [
         'name' => sanitize_plain($_POST['name'] ?? ''),
         'phone' => trim((string) ($_POST['phone'] ?? '')),
-        'email' => trim((string) ($_POST['email'] ?? '')),
+        'email' => '',
         'address' => sanitize_plain($_POST['address'] ?? ''),
         'landmark' => sanitize_plain($_POST['landmark'] ?? ''),
         'comment' => sanitize_plain($_POST['comment'] ?? ''),
@@ -70,7 +69,7 @@ $bodyClass = 'page-checkout';
 require __DIR__ . '/includes/header.php';
 ?>
 
-<section class="page-hero">
+<section class="page-hero page-hero--compact">
   <div class="container">
     <div class="page-hero-inner" data-reveal>
       <p class="eyebrow"><?= e(__('checkout_title')) ?></p>
@@ -81,95 +80,102 @@ require __DIR__ . '/includes/header.php';
 
 <section class="section checkout-section">
   <div class="container">
-    <div class="checkout-layout" data-reveal>
-      <form class="reservation-panel checkout-form" method="post" action="<?= e(base_url('checkout.php')) ?>" novalidate>
+    <div class="checkout-layout checkout-layout--compact" data-reveal>
+      <form class="checkout-form checkout-form--wow" method="post" action="<?= e(base_url('checkout.php')) ?>" novalidate data-checkout-form>
         <?= csrf_field() ?>
         <input type="hidden" name="idempotency_key" value="<?= e($idempotencyKey) ?>">
 
-        <div class="form-grid">
-          <div class="form-group<?= field_invalid('name', $errors) ?>">
-            <label for="checkout-name"><?= e(__('checkout_name')) ?> *</label>
-            <input type="text" id="checkout-name" name="name" required maxlength="120" autocomplete="name"
-                   value="<?= e($defaults['name']) ?>">
-            <?= field_error('name', $errors) ?>
-          </div>
-
-          <div class="form-group<?= field_invalid('phone', $errors) ?>">
-            <label for="checkout-phone"><?= e(__('checkout_phone')) ?> *</label>
-            <input type="tel" id="checkout-phone" name="phone" required maxlength="30" autocomplete="tel"
-                   inputmode="tel" value="<?= e($defaults['phone']) ?>">
-            <?= field_error('phone', $errors) ?>
-          </div>
-
-          <div class="form-group full<?= field_invalid('email', $errors) ?>">
-            <label for="checkout-email"><?= e(__('checkout_email')) ?></label>
-            <input type="email" id="checkout-email" name="email" maxlength="190" autocomplete="email"
-                   value="<?= e($defaults['email']) ?>">
-            <?= field_error('email', $errors) ?>
-          </div>
-
-          <div class="form-group full">
-            <span class="form-label"><?= e(__('checkout_delivery_type')) ?> *</span>
-            <div class="radio-group">
-              <label class="radio-label">
-                <input type="radio" name="delivery_type" value="delivery"
-                       <?= $defaults['delivery_type'] === 'delivery' ? 'checked' : '' ?>
-                       data-delivery-toggle>
-                <?= e(__('checkout_delivery')) ?>
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="delivery_type" value="pickup"
-                       <?= $defaults['delivery_type'] === 'pickup' ? 'checked' : '' ?>
-                       data-delivery-toggle>
-                <?= e(__('checkout_pickup')) ?>
-              </label>
+        <div class="checkout-card">
+          <h2 class="checkout-card__title"><?= e(__('checkout_name')) ?> / <?= e(__('checkout_phone')) ?></h2>
+          <div class="form-grid form-grid--2">
+            <div class="form-group<?= field_invalid('name', $errors) ?>">
+              <label for="checkout-name"><?= e(__('checkout_name')) ?> *</label>
+              <input type="text" id="checkout-name" name="name" required maxlength="120" autocomplete="name"
+                     value="<?= e($defaults['name']) ?>">
+              <?= field_error('name', $errors) ?>
             </div>
-          </div>
-
-          <div class="form-group full<?= field_invalid('address', $errors) ?>" data-address-field>
-            <label for="checkout-address"><?= e(__('checkout_address')) ?> *</label>
-            <input type="text" id="checkout-address" name="address" maxlength="255" autocomplete="street-address"
-                   value="<?= e($defaults['address']) ?>">
-            <?= field_error('address', $errors) ?>
-          </div>
-
-          <div class="form-group full<?= field_invalid('landmark', $errors) ?>">
-            <label for="checkout-landmark"><?= e(__('checkout_landmark')) ?></label>
-            <input type="text" id="checkout-landmark" name="landmark" maxlength="255"
-                   value="<?= e($defaults['landmark']) ?>">
-            <?= field_error('landmark', $errors) ?>
-          </div>
-
-          <div class="form-group full<?= field_invalid('comment', $errors) ?>">
-            <label for="checkout-comment"><?= e(__('checkout_comment')) ?></label>
-            <textarea id="checkout-comment" name="comment" maxlength="2000" rows="3"><?= e($defaults['comment']) ?></textarea>
-            <?= field_error('comment', $errors) ?>
-          </div>
-
-          <div class="form-group full">
-            <span class="form-label"><?= e(__('checkout_payment')) ?> *</span>
-            <div class="radio-group">
-              <label class="radio-label">
-                <input type="radio" name="payment_method" value="cash"
-                       <?= $defaults['payment_method'] === 'cash' ? 'checked' : '' ?>>
-                <?= e(__('checkout_cash')) ?>
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="payment_method" value="on_receipt"
-                       <?= $defaults['payment_method'] === 'on_receipt' ? 'checked' : '' ?>>
-                <?= e(__('checkout_on_receipt')) ?>
-              </label>
+            <div class="form-group<?= field_invalid('phone', $errors) ?>">
+              <label for="checkout-phone"><?= e(__('checkout_phone')) ?> *</label>
+              <input type="tel" id="checkout-phone" name="phone" required maxlength="30" autocomplete="tel"
+                     inputmode="tel" placeholder="+992 __ ___ ____" value="<?= e($defaults['phone']) ?>">
+              <?= field_error('phone', $errors) ?>
             </div>
-          </div>
-
-          <div class="form-group full form-actions">
-            <button class="btn btn-primary btn-full" type="submit"><?= e(__('checkout_place_order')) ?></button>
           </div>
         </div>
+
+        <div class="checkout-card">
+          <h2 class="checkout-card__title"><?= e(__('checkout_delivery_type')) ?></h2>
+          <div class="checkout-seg" role="group" aria-label="<?= e(__('checkout_delivery_type')) ?>">
+            <label class="checkout-seg__item">
+              <input type="radio" name="delivery_type" value="delivery"
+                     <?= $defaults['delivery_type'] === 'delivery' ? 'checked' : '' ?>
+                     data-delivery-toggle>
+              <span><?= e(__('checkout_delivery')) ?></span>
+            </label>
+            <label class="checkout-seg__item">
+              <input type="radio" name="delivery_type" value="pickup"
+                     <?= $defaults['delivery_type'] === 'pickup' ? 'checked' : '' ?>
+                     data-delivery-toggle>
+              <span><?= e(__('checkout_pickup')) ?></span>
+            </label>
+          </div>
+
+          <div class="checkout-address<?= $defaults['delivery_type'] === 'pickup' ? ' is-hidden' : '' ?>" data-address-block>
+            <div class="form-group<?= field_invalid('address', $errors) ?>" data-address-field>
+              <label for="checkout-address"><?= e(__('checkout_address')) ?> *</label>
+              <div class="checkout-address-row">
+                <input type="text" id="checkout-address" name="address" maxlength="255" autocomplete="street-address"
+                       placeholder="<?= e(__('checkout_address')) ?>"
+                       value="<?= e($defaults['address']) ?>" data-address-input>
+                <button
+                  type="button"
+                  class="btn btn-outline btn-sm checkout-geo-btn"
+                  data-geo-btn
+                  data-geo-loading="<?= e(__('checkout_geo_loading')) ?>"
+                  data-geo-ok="<?= e(__('checkout_geo_ok')) ?>"
+                  data-geo-fail="<?= e(__('checkout_geo_fail')) ?>"
+                >
+                  <?= e(__('checkout_geo')) ?>
+                </button>
+              </div>
+              <p class="checkout-geo-status" data-geo-status hidden></p>
+              <?= field_error('address', $errors) ?>
+            </div>
+            <div class="form-group<?= field_invalid('landmark', $errors) ?>">
+              <label for="checkout-landmark"><?= e(__('checkout_landmark')) ?></label>
+              <input type="text" id="checkout-landmark" name="landmark" maxlength="255"
+                     value="<?= e($defaults['landmark']) ?>">
+              <?= field_error('landmark', $errors) ?>
+            </div>
+          </div>
+        </div>
+
+        <div class="checkout-card">
+          <h2 class="checkout-card__title"><?= e(__('checkout_payment')) ?></h2>
+          <div class="checkout-seg">
+            <label class="checkout-seg__item">
+              <input type="radio" name="payment_method" value="cash"
+                     <?= $defaults['payment_method'] === 'cash' ? 'checked' : '' ?>>
+              <span><?= e(__('checkout_cash')) ?></span>
+            </label>
+            <label class="checkout-seg__item">
+              <input type="radio" name="payment_method" value="on_receipt"
+                     <?= $defaults['payment_method'] === 'on_receipt' ? 'checked' : '' ?>>
+              <span><?= e(__('checkout_on_receipt')) ?></span>
+            </label>
+          </div>
+          <div class="form-group<?= field_invalid('comment', $errors) ?>">
+            <label for="checkout-comment"><?= e(__('checkout_comment')) ?></label>
+            <textarea id="checkout-comment" name="comment" maxlength="2000" rows="2"><?= e($defaults['comment']) ?></textarea>
+            <?= field_error('comment', $errors) ?>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-full checkout-submit" type="submit"><?= e(__('checkout_place_order')) ?></button>
       </form>
 
-      <aside class="cart-summary reservation-panel checkout-summary">
-        <h2 class="section-title"><?= e(__('cart_title')) ?></h2>
+      <aside class="checkout-summary checkout-summary--wow">
+        <h2 class="checkout-summary__title"><?= e(__('cart_title')) ?></h2>
         <ul class="checkout-items">
           <?php foreach ($cart['items'] as $item): ?>
             <li>

@@ -6,7 +6,7 @@ declare(strict_types=1);
  * Language / i18n helpers. Fallback language is Russian (ru).
  */
 
-const AROMA_LANGS = ['ru', 'en', 'de'];
+const AROMA_LANGS = ['ru', 'tg'];
 const AROMA_LANG_DEFAULT = 'ru';
 
 function aroma_supported_lang(?string $code): bool
@@ -160,8 +160,7 @@ function html_lang_attr(): string
 function og_locale(): string
 {
     return match (current_lang()) {
-        'en' => 'en_US',
-        'de' => 'de_DE',
+        'tg' => 'tg_TJ',
         default => 'ru_RU',
     };
 }
