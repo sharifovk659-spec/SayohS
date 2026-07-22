@@ -1878,7 +1878,7 @@ body.modal-open { overflow: hidden; }
 
 @media (max-width: 768px) {
   :root {
-    --header-h: 72px;
+    --header-h: 52px;
   }
 
   .nav-desktop,
@@ -2951,7 +2951,41 @@ body.nav-open {
   gap: 0.55rem;
   flex-wrap: wrap;
   margin-top: 0.85rem;
+  position: relative;
+  z-index: 3;
 }
+
+@media (max-width: 640px) {
+  .dish-card-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .dish-card-actions .btn,
+  .dish-card-actions form,
+  .dish-card-actions button {
+    width: 100%;
+  }
+
+  .dish-card-actions button,
+  .dish-card-actions .btn {
+    min-height: 48px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .dish-detail-actions {
+    flex-direction: column;
+  }
+
+  .dish-detail-actions .btn,
+  .dish-detail-actions form,
+  .dish-detail-actions button {
+    width: 100%;
+    min-height: 48px;
+  }
+}
+
 .dish-card-title a:hover { color: var(--color-gold-deep); }
 
 .dish-detail-actions {

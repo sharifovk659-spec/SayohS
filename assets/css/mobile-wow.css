@@ -273,9 +273,13 @@ svg {
 
   .brand-logo,
   .site-header--compact .brand-logo {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     padding: 2px;
+  }
+
+  :root {
+    --header-h: 52px;
   }
 }
 

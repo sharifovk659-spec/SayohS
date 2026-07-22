@@ -78,13 +78,19 @@ function cart_get_or_create_db(?int $userId, ?string $sessionToken): ?int
     return null;
 }
 
+function cart_cookie_name(): string
+{
+    return 'sayoh_cart';
+}
+
 /**
- * Session cart format: [dish_id => qty]
+ * Normalize cart map: [dish_id => qty]
+ *
+ * @param mixed $raw
  * @return array<int,int>
  */
-function cart_session_map(): array
+function cart_normalize_map(mixed $raw): array
 {
-    $raw = $_SESSION['cart'] ?? [];
     if (!is_array($raw)) {
         return [];
     }
@@ -99,24 +105,88 @@ function cart_session_map(): array
     return $out;
 }
 
+/**
+ * Session + cookie cart (cookie needed on Vercel where /tmp sessions do not stick).
+ *
+ * @return array<int,int>
+ */
+function cart_session_map(): array
+{
+    $raw = $_SESSION['cart'] ?? null;
+    if (!is_array($raw) || $raw === []) {
+        $cookie = $_COOKIE[cart_cookie_name()] ?? '';
+        if (is_string($cookie) && $cookie !== '') {
+            $decoded = json_decode($cookie, true);
+            if (is_array($decoded)) {
+                $raw = $decoded;
+                $_SESSION['cart'] = cart_normalize_map($decoded);
+            }
+        }
+    }
+    return cart_normalize_map($raw);
+}
+
 function cart_persist_session(array $map): void
 {
+    $map = cart_normalize_map($map);
     $_SESSION['cart'] = $map;
+    $payload = json_encode($map, JSON_UNESCAPED_UNICODE);
+    if ($payload === false) {
+        $payload = '{}';
+    }
+    $https = function_exists('request_is_https') ? request_is_https() : false;
+    @setcookie(cart_cookie_name(), $payload, [
+        'expires' => time() + 60 * 60 * 24 * 30,
+        'path' => '/',
+        'secure' => $https,
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+    $_COOKIE[cart_cookie_name()] = $payload;
 }
 
 function cart_fetch_dish(int $dishId): ?array
 {
-    try {
-        $stmt = db()->prepare(
-            'SELECT id, name, slug, price, is_available, image, short_description
-             FROM dishes WHERE id = ? LIMIT 1'
-        );
-        $stmt->execute([$dishId]);
-        $row = $stmt->fetch();
-        return $row ?: null;
-    } catch (Throwable $e) {
+    if ($dishId <= 0) {
         return null;
     }
+
+    if (db_available()) {
+        try {
+            $stmt = db()->prepare(
+                'SELECT id, name, slug, price, is_available, image, short_description
+                 FROM dishes WHERE id = ? LIMIT 1'
+            );
+            $stmt->execute([$dishId]);
+            $row = $stmt->fetch();
+            if ($row) {
+                return $row;
+            }
+        } catch (Throwable $e) {
+            storage_log('cart_fetch_dish db: ' . $e->getMessage());
+        }
+    }
+
+    // Fallback catalog (Vercel / no MySQL) so add-to-cart works on phone
+    if (!function_exists('catalog_data')) {
+        require_once __DIR__ . '/catalog.php';
+    }
+    foreach (catalog_data()['dishes'] as $dish) {
+        if ((int) ($dish['id'] ?? 0) !== $dishId) {
+            continue;
+        }
+        return [
+            'id' => (int) $dish['id'],
+            'name' => (string) ($dish['name'] ?? ''),
+            'slug' => (string) ($dish['slug'] ?? ''),
+            'price' => (float) ($dish['price'] ?? 0),
+            'is_available' => (int) ($dish['is_available'] ?? 1),
+            'image' => $dish['image'] ?? null,
+            'short_description' => (string) ($dish['description'] ?? $dish['short_description'] ?? ''),
+        ];
+    }
+
+    return null;
 }
 
 function cart_add(int $dishId, int $qty = 1): bool
@@ -127,30 +197,29 @@ function cart_add(int $dishId, int $qty = 1): bool
         return false;
     }
 
-    if (user_logged_in()) {
+    if (user_logged_in() && db_available()) {
         $cartId = cart_get_or_create_db((int) $_SESSION['user_id'], null);
-        if (!$cartId) {
-            return false;
-        }
-        try {
-            $stmt = db()->prepare('SELECT id, quantity FROM cart_items WHERE cart_id = ? AND dish_id = ? LIMIT 1');
-            $stmt->execute([$cartId, $dishId]);
-            $existing = $stmt->fetch();
-            $price = (float) $dish['price'];
-            if ($existing) {
-                $newQty = min(cart_max_qty(), (int) $existing['quantity'] + $qty);
-                db()->prepare('UPDATE cart_items SET quantity = ?, unit_price = ?, updated_at = NOW() WHERE id = ?')
-                    ->execute([$newQty, $price, (int) $existing['id']]);
-            } else {
-                db()->prepare(
-                    'INSERT INTO cart_items (cart_id, dish_id, quantity, unit_price) VALUES (?, ?, ?, ?)'
-                )->execute([$cartId, $dishId, $qty, $price]);
+        if ($cartId) {
+            try {
+                $stmt = db()->prepare('SELECT id, quantity FROM cart_items WHERE cart_id = ? AND dish_id = ? LIMIT 1');
+                $stmt->execute([$cartId, $dishId]);
+                $existing = $stmt->fetch();
+                $price = (float) $dish['price'];
+                if ($existing) {
+                    $newQty = min(cart_max_qty(), (int) $existing['quantity'] + $qty);
+                    db()->prepare('UPDATE cart_items SET quantity = ?, unit_price = ?, updated_at = NOW() WHERE id = ?')
+                        ->execute([$newQty, $price, (int) $existing['id']]);
+                } else {
+                    db()->prepare(
+                        'INSERT INTO cart_items (cart_id, dish_id, quantity, unit_price) VALUES (?, ?, ?, ?)'
+                    )->execute([$cartId, $dishId, $qty, $price]);
+                }
+                db()->prepare('UPDATE carts SET updated_at = NOW() WHERE id = ?')->execute([$cartId]);
+                return true;
+            } catch (Throwable $e) {
+                storage_log('cart_add db: ' . $e->getMessage());
+                // fall through to session/cookie cart
             }
-            db()->prepare('UPDATE carts SET updated_at = NOW() WHERE id = ?')->execute([$cartId]);
-            return true;
-        } catch (Throwable $e) {
-            storage_log('cart_add db: ' . $e->getMessage());
-            return false;
         }
     }
 
@@ -174,21 +243,19 @@ function cart_set_qty(int $dishId, int $qty): bool
         return false;
     }
 
-    if (user_logged_in()) {
+    if (user_logged_in() && db_available()) {
         $cartId = cart_get_or_create_db((int) $_SESSION['user_id'], null);
-        if (!$cartId) {
-            return false;
-        }
-        try {
-            $price = (float) $dish['price'];
-            db()->prepare(
-                'INSERT INTO cart_items (cart_id, dish_id, quantity, unit_price) VALUES (?, ?, ?, ?)
-                 ON DUPLICATE KEY UPDATE quantity = VALUES(quantity), unit_price = VALUES(unit_price), updated_at = NOW()'
-            )->execute([$cartId, $dishId, $qty, $price]);
-            return true;
-        } catch (Throwable $e) {
-            storage_log('cart_set_qty: ' . $e->getMessage());
-            return false;
+        if ($cartId) {
+            try {
+                $price = (float) $dish['price'];
+                db()->prepare(
+                    'INSERT INTO cart_items (cart_id, dish_id, quantity, unit_price) VALUES (?, ?, ?, ?)
+                     ON DUPLICATE KEY UPDATE quantity = VALUES(quantity), unit_price = VALUES(unit_price), updated_at = NOW()'
+                )->execute([$cartId, $dishId, $qty, $price]);
+                return true;
+            } catch (Throwable $e) {
+                storage_log('cart_set_qty: ' . $e->getMessage());
+            }
         }
     }
 
@@ -200,16 +267,15 @@ function cart_set_qty(int $dishId, int $qty): bool
 
 function cart_remove(int $dishId): bool
 {
-    if (user_logged_in()) {
+    if (user_logged_in() && db_available()) {
         try {
             $cartId = cart_get_or_create_db((int) $_SESSION['user_id'], null);
-            if (!$cartId) {
-                return false;
+            if ($cartId) {
+                db()->prepare('DELETE FROM cart_items WHERE cart_id = ? AND dish_id = ?')->execute([$cartId, $dishId]);
+                return true;
             }
-            db()->prepare('DELETE FROM cart_items WHERE cart_id = ? AND dish_id = ?')->execute([$cartId, $dishId]);
-            return true;
         } catch (Throwable $e) {
-            return false;
+            // fall through
         }
     }
     $map = cart_session_map();
@@ -220,7 +286,7 @@ function cart_remove(int $dishId): bool
 
 function cart_clear(): void
 {
-    if (user_logged_in()) {
+    if (user_logged_in() && db_available()) {
         try {
             $cartId = cart_get_or_create_db((int) $_SESSION['user_id'], null);
             if ($cartId) {
@@ -229,9 +295,9 @@ function cart_clear(): void
         } catch (Throwable $e) {
             storage_log('cart_clear: ' . $e->getMessage());
         }
-        return;
     }
     unset($_SESSION['cart']);
+    cart_persist_session([]);
 }
 
 /**
@@ -244,7 +310,8 @@ function cart_snapshot(bool $includeDelivery = true): array
     $count = 0;
 
     try {
-        if (user_logged_in()) {
+        $usedDb = false;
+        if (user_logged_in() && db_available()) {
             $cartId = cart_get_or_create_db((int) $_SESSION['user_id'], null);
             if ($cartId) {
                 $stmt = db()->prepare(
@@ -282,8 +349,10 @@ function cart_snapshot(bool $includeDelivery = true): array
                     $subtotal += $line;
                     $count += $qty;
                 }
+                $usedDb = true;
             }
-        } else {
+        }
+        if (!$usedDb) {
             foreach (cart_session_map() as $dishId => $qty) {
                 $dish = cart_fetch_dish($dishId);
                 if (!$dish || (int) $dish['is_available'] !== 1) {

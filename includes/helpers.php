@@ -118,12 +118,37 @@ function format_price(float|string $price): string
     return number_format((float) $price, 0, ',', ' ') . ' ₽';
 }
 
+function request_is_https(): bool
+{
+    return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower((string) $_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https')
+        || (isset($_SERVER['SERVER_PORT']) && (string) $_SERVER['SERVER_PORT'] === '443')
+        || (getenv('VERCEL') !== false);
+}
+
 function csrf_token(): string
 {
-    if (empty($_SESSION['csrf_token'])) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    if (empty($_SESSION['csrf_token']) || !is_string($_SESSION['csrf_token'])) {
+        // Restore from cookie on serverless (Vercel /tmp sessions are ephemeral)
+        $fromCookie = $_COOKIE['csrf_token'] ?? '';
+        if (is_string($fromCookie) && preg_match('/^[a-f0-9]{64}$/', $fromCookie)) {
+            $_SESSION['csrf_token'] = $fromCookie;
+        } else {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
     }
-    return $_SESSION['csrf_token'];
+    $token = (string) $_SESSION['csrf_token'];
+    if (!isset($_COOKIE['csrf_token']) || $_COOKIE['csrf_token'] !== $token) {
+        @setcookie('csrf_token', $token, [
+            'expires' => 0,
+            'path' => '/',
+            'secure' => request_is_https(),
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]);
+        $_COOKIE['csrf_token'] = $token;
+    }
+    return $token;
 }
 
 function csrf_field(): string
@@ -133,9 +158,17 @@ function csrf_field(): string
 
 function verify_csrf(?string $token): bool
 {
-    return is_string($token)
-        && isset($_SESSION['csrf_token'])
-        && hash_equals($_SESSION['csrf_token'], $token);
+    if (!is_string($token) || $token === '') {
+        return false;
+    }
+    $expected = '';
+    if (!empty($_SESSION['csrf_token']) && is_string($_SESSION['csrf_token'])) {
+        $expected = $_SESSION['csrf_token'];
+    } elseif (!empty($_COOKIE['csrf_token']) && is_string($_COOKIE['csrf_token'])) {
+        $expected = $_COOKIE['csrf_token'];
+        $_SESSION['csrf_token'] = $expected;
+    }
+    return $expected !== '' && hash_equals($expected, $token);
 }
 
 function flash(string $type, string $message): void

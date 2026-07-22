@@ -265,14 +265,34 @@
   };
 
   const postJson = async (url, payload) => {
-    const body = new URLSearchParams({ ...payload, csrf_token: csrfToken });
+    const body = new URLSearchParams({ ...payload, csrf_token: csrfToken || '' });
     const res = await fetch(url, {
       method: 'POST',
-      headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+      },
       body,
-      credentials: 'same-origin'
+      credentials: 'same-origin',
+      cache: 'no-store'
     });
+    const ct = (res.headers.get('content-type') || '').toLowerCase();
+    if (!ct.includes('application/json')) {
+      throw new Error('not_json');
+    }
     return res.json();
+  };
+
+  const flashBtn = (btn, text, ms = 1200) => {
+    if (!btn) return;
+    const prev = btn.textContent;
+    btn.textContent = text;
+    btn.disabled = true;
+    setTimeout(() => {
+      btn.textContent = prev;
+      btn.disabled = false;
+    }, ms);
   };
 
   document.querySelectorAll('[data-fav-form]').forEach((form) => {
@@ -290,32 +310,37 @@
           if (path) path.setAttribute('fill', data.favorited ? 'currentColor' : 'none');
         }
         if (typeof data.count !== 'undefined') setCount('[data-fav-count]', data.count);
-      } catch (_) { form.submit(); }
+      } catch (_) {
+        form.submit();
+      }
     });
   });
 
   document.querySelectorAll('[data-cart-form]').forEach((form) => {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      e.stopPropagation();
+      const btn = form.querySelector('[data-add-cart]');
       const fd = new FormData(form);
+      if (btn) btn.disabled = true;
       try {
         const data = await postJson(baseUrl + '/api/cart.php', {
           action: fd.get('action') || 'add',
           dish_id: fd.get('dish_id'),
           quantity: fd.get('quantity') || 1
         });
-        if (!data || !data.ok) return;
-        if (typeof data.count !== 'undefined') setCount('[data-cart-count]', data.count);
-        const btn = form.querySelector('[data-add-cart]');
-        if (btn) {
-          const prev = btn.textContent;
-          btn.textContent = '✓';
-          setTimeout(() => { btn.textContent = prev; }, 900);
+        if (!data || !data.ok) {
+          flashBtn(btn, '!');
+          form.submit();
+          return;
         }
-      } catch (_) { form.submit(); }
-    });
+        if (typeof data.count !== 'undefined') setCount('[data-cart-count]', data.count);
+        flashBtn(btn, '✓');
+      } catch (_) {
+        form.submit();
+      }
+    }, { passive: false });
   });
-
   /* Search suggestions with debounce */
   const searchInput = document.querySelector('[data-search-input]');
   const searchSuggest = document.querySelector('[data-search-suggest]');
