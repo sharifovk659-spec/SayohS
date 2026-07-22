@@ -30,14 +30,15 @@
 }
 
 .site-header--compact .brand-name {
-  font-size: 1.28rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: 1.4rem;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  font-family: "Cormorant Garamond", Georgia, serif;
 }
 
 .site-header--compact .brand-tag {
-  font-size: 0.62rem;
-  letter-spacing: 0.16em;
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
 }
 
 .site-header--compact .nav-desktop {
@@ -565,6 +566,69 @@
   }
 }
 
+@media (max-width: 768px) {
+  .page-home .categories-slider {
+    border-radius: 22px;
+    padding: 1rem 0.65rem 1.15rem;
+    position: relative;
+  }
+
+  .page-home .categories-nav {
+    position: static;
+    display: flex !important;
+    justify-content: center;
+    gap: 0.65rem;
+    margin-top: 0.85rem;
+    top: auto;
+  }
+
+  .page-home .categories-nav .slider-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid rgba(92, 64, 42, 0.12);
+    background: #fff;
+    box-shadow: 0 6px 16px rgba(40, 24, 12, 0.08);
+  }
+
+  .page-home .category-card {
+    min-width: 108px;
+    padding: 0.2rem;
+  }
+
+  .page-home .category-card-media {
+    width: 84px;
+    height: 84px;
+    border-width: 2px;
+    margin-bottom: 0.45rem;
+  }
+
+  .page-home .category-card-name {
+    font-size: 0.82rem;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .page-home .category-card-arrow {
+    display: none;
+  }
+
+  .page-home .categories-track--marquee {
+    animation-duration: 22s;
+    gap: 0.65rem;
+  }
+
+  .page-home .categories-slider--marquee:hover .categories-track--marquee {
+    animation-play-state: running;
+  }
+
+  .page-home .categories-slider.is-paused .categories-track--marquee {
+    animation-play-state: paused;
+  }
+}
+
 /* ---- About / gallery / reservation polish ---- */
 .page-home .about-home {
   gap: clamp(1.5rem, 4vw, 3rem);
@@ -709,6 +773,15 @@
 }
 
 @media (max-width: 900px) {
+  .site-header--compact {
+    background: #ffffff;
+  }
+
+  .site-header--compact.is-scrolled {
+    background: #ffffff;
+    box-shadow: 0 4px 18px rgba(40, 24, 12, 0.06);
+  }
+
   .site-header--compact .nav-desktop {
     display: none;
   }
@@ -815,21 +888,23 @@
   }
 
   .hero--premium .hero-actions {
-    flex-direction: column;
+    flex-direction: row;
     flex-wrap: nowrap;
-    gap: 0.55rem;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.45rem;
     width: 100%;
   }
 
   .hero--premium .hero-actions .btn {
-    width: 100%;
-    flex: none;
+    width: auto;
+    flex: 1 1 0;
     min-width: 0;
-    min-height: 46px;
-    padding-inline: 1rem;
-    font-size: 0.92rem;
+    min-height: 42px;
+    padding-inline: 0.65rem;
+    font-size: 0.78rem;
     justify-content: center;
-    white-space: normal;
+    white-space: nowrap;
   }
 
   .hero-social-proof {
@@ -893,17 +968,20 @@
   }
 
   .hero--premium .hero-actions {
-    flex-direction: column;
+    flex-direction: row;
     flex-wrap: nowrap;
-    align-items: stretch;
+    align-items: center;
+    gap: 0.4rem;
   }
 
   .hero--premium .hero-actions .btn {
-    width: 100%;
+    width: auto;
+    flex: 1 1 0;
     justify-content: center;
-    font-size: 0.9rem;
-    padding-inline: 0.9rem;
-    min-height: 46px;
+    font-size: 0.72rem;
+    padding-inline: 0.5rem;
+    min-height: 40px;
+    white-space: nowrap;
   }
 
   .hero-plate {

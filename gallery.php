@@ -5,7 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/includes/init.php';
 
 $pageTitle = 'Галерея — ' . ($app['full_name'] ?? $app['name']);
-$pageDescription = 'Атмосфера, интерьер и блюда ресторана Aroma.';
+$pageDescription = 'Атмосфера, интерьер и блюда чайханы Сайёҳ.';
 $bodyClass = 'page-gallery';
 
 $albums = [
@@ -32,7 +32,7 @@ require __DIR__ . '/includes/header.php';
     <div class="page-hero-inner" data-reveal>
       <p class="eyebrow">Пространство</p>
       <h1>Галерея</h1>
-      <p>Интерьер, блюда и команда — атмосфера Aroma в деталях.</p>
+      <p>Интерьер, блюда и атмосфера чайханы Сайёҳ.</p>
     </div>
   </div>
 </section>

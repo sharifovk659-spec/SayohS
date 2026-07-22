@@ -284,23 +284,20 @@ svg {
 }
 
 @media (max-width: 390px) {
-  .site-header--compact .brand-tag {
-    display: none;
-  }
-
   .header-icon-link,
   .menu-toggle {
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    min-height: 40px;
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    min-height: 42px;
   }
 
   .hero--premium .hero-actions .btn {
-    width: 100%;
-    min-height: 48px;
-    font-size: 0.92rem;
-    padding-inline: 1rem;
+    width: auto;
+    flex: 1 1 0;
+    min-height: 40px;
+    font-size: 0.72rem;
+    padding-inline: 0.45rem;
   }
 
   .cart-item-card {
@@ -362,27 +359,38 @@ svg {
   .cta-banner-inner,
   .page-empty .hero-actions {
     display: flex;
-    flex-direction: column;
-    gap: 0.7rem;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.45rem;
     width: 100%;
   }
 
-  .hero-actions .btn,
+  .page-home .hero-actions .btn,
+  .hero--premium .hero-actions .btn {
+    width: auto;
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 42px;
+    font-size: 0.78rem;
+    padding-inline: 0.55rem;
+    justify-content: center;
+    white-space: nowrap;
+  }
+
   .cta-banner .btn,
   .page-empty .hero-actions .btn {
-    width: 100%;
+    width: auto;
+    flex: 1 1 0;
     justify-content: center;
   }
 
   .mobile-nav {
-    padding: 1rem;
+    padding: 0.85rem 0.9rem 1.25rem;
   }
 
   .mobile-nav a {
-    min-height: 48px;
-    display: flex;
-    align-items: center;
-    font-size: 1.05rem;
+    min-height: 52px;
   }
 
   .footer-grid,

@@ -43,17 +43,9 @@ $compactHome = ($formId === 'home-reservation');
 
           <div class="form-group<?= field_invalid('phone', $errors) ?>">
             <label for="<?= e($formId) ?>-phone"><?= e(__('res_phone')) ?> *</label>
-            <input type="tel" id="<?= e($formId) ?>-phone" name="phone" required maxlength="30" autocomplete="tel" inputmode="tel" placeholder="+7 (___) ___-__-__" value="<?= e((string) old('phone')) ?>">
+            <input type="tel" id="<?= e($formId) ?>-phone" name="phone" required maxlength="30" autocomplete="tel" inputmode="tel" placeholder="+992 __ ___ ____" value="<?= e((string) old('phone')) ?>">
             <?= field_error('phone', $errors) ?>
           </div>
-
-          <?php if (!$compactHome): ?>
-          <div class="form-group<?= field_invalid('email', $errors) ?>">
-            <label for="<?= e($formId) ?>-email"><?= e(__('res_email')) ?></label>
-            <input type="email" id="<?= e($formId) ?>-email" name="email" maxlength="120" autocomplete="email" value="<?= e((string) old('email')) ?>">
-            <?= field_error('email', $errors) ?>
-          </div>
-          <?php endif; ?>
 
           <div class="form-group<?= field_invalid('guests', $errors) ?>">
             <label for="<?= e($formId) ?>-guests"><?= e(__('res_guests')) ?> *</label>
@@ -88,7 +80,7 @@ $compactHome = ($formId === 'home-reservation');
           <?php if (!$compactHome): ?>
           <div class="form-group full<?= field_invalid('message', $errors) ?>">
             <label for="<?= e($formId) ?>-message"><?= e(__('res_message')) ?></label>
-            <textarea id="<?= e($formId) ?>-message" name="message" maxlength="1000" rows="4"><?= e((string) old('message')) ?></textarea>
+            <textarea id="<?= e($formId) ?>-message" name="message" maxlength="1000" rows="3" placeholder="Пожелания к столу (необязательно)"><?= e((string) old('message')) ?></textarea>
             <?= field_error('message', $errors) ?>
           </div>
           <?php endif; ?>
@@ -96,7 +88,7 @@ $compactHome = ($formId === 'home-reservation');
           <div class="form-group full<?= field_invalid('privacy', $errors) ?><?= $compactHome ? ' form-privacy-compact' : '' ?>">
             <label class="checkbox-label">
               <input type="checkbox" name="privacy" value="1" <?= old('privacy') ? 'checked' : '' ?> required>
-              <span><?= e(__('privacy_agree')) ?> *</span>
+              <span><?= e(__('privacy_agree')) ?> * — <a href="<?= e(base_url('privacy.php')) ?>" target="_blank" rel="noopener"><?= e(__('footer_privacy')) ?></a></span>
             </label>
             <?= field_error('privacy', $errors) ?>
           </div>

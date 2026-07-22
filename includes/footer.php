@@ -58,11 +58,11 @@ $socialIconSvg = static function (string $icon): string {
 $waNumber = '100944545';
 $waHref = 'https://wa.me/992' . $waNumber;
 $waTips = [
-    'Напишите нам',
-    'Бронь за 1 минуту',
-    'Доставка — сюда',
     'Мы онлайн',
-    'Заказ в WhatsApp',
+    'Напишите нам',
+    'Быстрый ответ',
+    'Заказ сюда',
+    'Бронь онлайн',
 ];
 $waTip = $waTips[array_rand($waTips)];
 
@@ -127,6 +127,59 @@ $footerLogoUrl = is_file($footerLogoAsset) ? asset('images/brand/sayoh-logo.png'
       </div>
     </div>
   </footer>
+
+  <?php
+  $currentUser = $currentUser ?? (function_exists('current_user') ? current_user() : null);
+  $cartCount = isset($cartCount) ? (int) $cartCount : (function_exists('cart_count') ? cart_count() : 0);
+  $favCount = isset($favCount) ? (int) $favCount : (function_exists('favorites_count') ? favorites_count() : 0);
+  $scriptName = basename((string) ($_SERVER['SCRIPT_NAME'] ?? ''));
+  $scriptPath = str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? ''));
+  $pageKey = function_exists('current_page') ? current_page() : pathinfo($scriptName, PATHINFO_FILENAME);
+  $bottomHomeActive = $pageKey === 'index' || $pageKey === '';
+  $bottomMenuActive = in_array($pageKey, ['menu', 'dish'], true);
+  $bottomFavActive = str_contains($scriptPath, '/account/favorites.php') || $pageKey === 'favorites';
+  $bottomCartActive = in_array($pageKey, ['cart', 'checkout'], true);
+  $bottomProfileActive = (!$bottomFavActive) && (
+      str_contains($scriptPath, '/account/')
+      || in_array($pageKey, ['login', 'register', 'profile'], true)
+  );
+  $bottomFavHref = base_url($currentUser ? 'account/favorites.php' : 'login.php');
+  $bottomProfileHref = base_url($currentUser ? 'account/' : 'login.php');
+  ?>
+  <nav class="mobile-bottom-bar" aria-label="<?= e(__('nav_home')) ?>" data-mobile-bottom>
+    <a class="mobile-bottom-bar__item<?= $bottomHomeActive ? ' is-active' : '' ?>" href="<?= e(base_url()) ?>">
+      <span class="mobile-bottom-bar__icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      </span>
+      <span class="mobile-bottom-bar__label"><?= e(__('nav_home')) ?></span>
+    </a>
+    <a class="mobile-bottom-bar__item<?= $bottomMenuActive ? ' is-active' : '' ?>" href="<?= e(base_url('menu.php')) ?>">
+      <span class="mobile-bottom-bar__icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M8 3v18M8 3c0 2.5-1.5 4-3 4M11 4h1.2c1.6 0 2.8 1.2 2.8 2.8V9c0 2-1.5 3.5-3.5 3.5H11V22M16.5 3.5c0 3.2 1.2 5 2.5 6.2V22" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      <span class="mobile-bottom-bar__label"><?= e(__('nav_menu')) ?></span>
+    </a>
+    <a class="mobile-bottom-bar__item<?= $bottomFavActive ? ' is-active' : '' ?>" href="<?= e($bottomFavHref) ?>" aria-label="<?= e(__('nav_favorites')) ?>">
+      <span class="mobile-bottom-bar__icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      </span>
+      <span class="mobile-bottom-bar__label"><?= e(__('nav_favorites')) ?></span>
+      <span class="mobile-bottom-bar__count" data-fav-count <?= $favCount > 0 ? '' : 'hidden' ?>><?= (int) $favCount ?></span>
+    </a>
+    <a class="mobile-bottom-bar__item<?= $bottomCartActive ? ' is-active' : '' ?>" href="<?= e(base_url('cart.php')) ?>" aria-label="<?= e(__('nav_cart')) ?>" data-cart-link>
+      <span class="mobile-bottom-bar__icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M7 8h10l1 12H6L7 8Zm2.5-3.5h5A2.5 2.5 0 0 1 17 7v1H7V7a2.5 2.5 0 0 1 2.5-2.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      </span>
+      <span class="mobile-bottom-bar__label"><?= e(__('nav_cart')) ?></span>
+      <span class="mobile-bottom-bar__count" data-cart-count <?= $cartCount > 0 ? '' : 'hidden' ?>><?= (int) $cartCount ?></span>
+    </a>
+    <a class="mobile-bottom-bar__item<?= $bottomProfileActive ? ' is-active' : '' ?>" href="<?= e($bottomProfileHref) ?>" aria-label="<?= e(__('account_profile')) ?>">
+      <span class="mobile-bottom-bar__icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-3.5 0-6.5 1.8-6.5 4v1.5h13V18c0-2.2-3-4-6.5-4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      </span>
+      <span class="mobile-bottom-bar__label"><?= e(__('account_profile')) ?></span>
+    </a>
+  </nav>
 
   <a
     class="wa-float"

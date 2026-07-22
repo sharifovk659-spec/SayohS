@@ -92,7 +92,7 @@ $phoneTel = $phoneHref !== '' ? 'tel:' . preg_replace('/[^\d+]/', '', $phoneHref
     <div class="container header-inner">
       <a class="brand" href="<?= e(base_url()) ?>" aria-label="<?= e($app['full_name'] ?? $app['name']) ?>">
         <?php if ($logoUrl !== ''): ?>
-          <img class="brand-logo" src="<?= e($logoUrl) ?>" alt="<?= e((string) ($app['full_name'] ?? $app['name'])) ?>" width="72" height="72" decoding="async">
+          <img class="brand-logo" src="<?= e($logoUrl) ?>" alt="" width="72" height="72" decoding="async">
         <?php else: ?>
           <span class="brand-mark" aria-hidden="true">
             <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
@@ -102,6 +102,10 @@ $phoneTel = $phoneHref !== '' ? 'tel:' . preg_replace('/[^\d+]/', '', $phoneHref
             </svg>
           </span>
         <?php endif; ?>
+        <span class="brand-text">
+          <span class="brand-name"><?= e((string) ($app['name'] ?? 'Сайёҳ')) ?></span>
+          <span class="brand-tag">ЧАЙХАНА</span>
+        </span>
       </a>
 
       <nav class="nav-desktop" aria-label="<?= e(__('nav_home')) ?>">
@@ -139,18 +143,18 @@ $phoneTel = $phoneHref !== '' ? 'tel:' . preg_replace('/[^\d+]/', '', $phoneHref
           </div>
         </div>
 
-        <a class="header-icon-link" href="<?= e(base_url($currentUser ? 'account/favorites.php' : 'login.php')) ?>" aria-label="<?= e(__('nav_favorites')) ?>">
+        <a class="header-icon-link header-icon-link--desktop" href="<?= e(base_url($currentUser ? 'account/favorites.php' : 'login.php')) ?>" aria-label="<?= e(__('nav_favorites')) ?>">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
           <span class="header-count" data-fav-count <?= $favCount > 0 ? '' : 'hidden' ?>><?= (int) $favCount ?></span>
         </a>
 
-        <a class="header-icon-link" href="<?= e(base_url('cart.php')) ?>" aria-label="<?= e(__('nav_cart')) ?>" data-cart-link>
+        <a class="header-icon-link header-icon-link--desktop" href="<?= e(base_url('cart.php')) ?>" aria-label="<?= e(__('nav_cart')) ?>" data-cart-link>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 8h12l-1 11H7L6 8Zm3-3h6a2 2 0 0 1 2 2v1H7V7a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
           <span class="header-count" data-cart-count <?= $cartCount > 0 ? '' : 'hidden' ?>><?= (int) $cartCount ?></span>
         </a>
 
         <?php if ($currentUser): ?>
-          <div class="header-user" data-user-menu>
+          <div class="header-user header-user--desktop" data-user-menu>
             <button type="button" class="header-user-btn" data-user-toggle aria-expanded="false" aria-haspopup="true">
               <span class="header-avatar" aria-hidden="true"><?= e(mb_strtoupper(mb_substr((string) $currentUser['name'], 0, 1))) ?></span>
             </button>
@@ -165,7 +169,7 @@ $phoneTel = $phoneHref !== '' ? 'tel:' . preg_replace('/[^\d+]/', '', $phoneHref
             </div>
           </div>
         <?php else: ?>
-          <a class="header-text-link" href="<?= e(base_url('login.php')) ?>"><?= e(__('nav_login')) ?></a>
+          <a class="header-text-link header-text-link--desktop" href="<?= e(base_url('login.php')) ?>"><?= e(__('nav_login')) ?></a>
         <?php endif; ?>
 
         <a class="btn btn-primary header-cta header-cta--call" href="<?= e($phoneTel) ?>">
@@ -173,36 +177,53 @@ $phoneTel = $phoneHref !== '' ? 'tel:' . preg_replace('/[^\d+]/', '', $phoneHref
           <span><?= e(__('nav_call')) ?></span>
         </a>
 
-        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav" aria-label="<?= e(__('open_menu')) ?>" data-menu-toggle>
+        <button class="menu-toggle menu-toggle--round" type="button" aria-expanded="false" aria-controls="mobile-nav" aria-label="<?= e(__('open_menu')) ?>" data-menu-toggle>
           <span class="menu-toggle-bars" aria-hidden="true"></span>
         </button>
       </div>
     </div>
-
-    <div class="mobile-nav" id="mobile-nav" data-mobile-nav hidden>
-      <nav aria-label="<?= e(__('open_menu')) ?>">
-        <a href="<?= e(base_url()) ?>"><?= e(__('nav_home')) ?></a>
-        <a href="<?= e(base_url('menu.php')) ?>"><?= e(__('nav_menu')) ?></a>
-        <a href="<?= e(base_url('gallery.php')) ?>"><?= e(__('nav_gallery')) ?></a>
-        <a href="<?= e(base_url('reservation.php')) ?>"><?= e(__('nav_reservation')) ?></a>
-        <a href="<?= e(base_url('contacts.php')) ?>"><?= e(__('nav_contacts')) ?></a>
-        <a href="<?= e(base_url('cart.php')) ?>"><?= e(__('nav_cart')) ?> (<?= (int) $cartCount ?>)</a>
-        <a href="<?= e(base_url($currentUser ? 'account/favorites.php' : 'login.php')) ?>"><?= e(__('nav_favorites')) ?> (<?= (int) $favCount ?>)</a>
-        <?php if ($currentUser): ?>
-          <a href="<?= e(base_url('account/')) ?>"><?= e(__('nav_account')) ?></a>
-        <?php else: ?>
-          <a href="<?= e(base_url('login.php')) ?>"><?= e(__('nav_login')) ?></a>
-          <a href="<?= e(base_url('register.php')) ?>"><?= e(__('nav_register')) ?></a>
-        <?php endif; ?>
-        <a class="mobile-call" href="<?= e($phoneTel) ?>"><?= e(__('nav_call')) ?></a>
-        <div class="mobile-lang">
-          <?php foreach (['ru' => 'RU', 'en' => 'EN', 'de' => 'DE'] as $code => $label): ?>
-            <a class="<?= $lang === $code ? 'is-active' : '' ?>" href="<?= e(lang_url($code)) ?>"><?= e($label) ?></a>
-          <?php endforeach; ?>
-        </div>
-      </nav>
-    </div>
   </header>
+
+  <div class="mobile-nav-overlay" data-mobile-overlay hidden></div>
+  <aside class="mobile-nav mobile-nav--drawer" id="mobile-nav" data-mobile-nav hidden>
+    <div class="mobile-nav__top">
+      <button type="button" class="mobile-nav__close" data-menu-close aria-label="<?= e(__('close_menu')) ?>">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <nav aria-label="<?= e(__('open_menu')) ?>">
+      <a href="<?= e(base_url()) ?>">
+        <span class="mobile-nav__ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></span>
+        <span class="mobile-nav__label"><?= e(__('nav_home')) ?></span>
+        <span class="mobile-nav__chev" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </a>
+      <a href="<?= e(base_url('menu.php')) ?>">
+        <span class="mobile-nav__ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M8 3v18M8 3c0 2.5-1.5 4-3 4M11 4h1.2c1.6 0 2.8 1.2 2.8 2.8V9c0 2-1.5 3.5-3.5 3.5H11V22M16.5 3.5c0 3.2 1.2 5 2.5 6.2V22" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="mobile-nav__label"><?= e(__('nav_menu')) ?></span>
+        <span class="mobile-nav__chev" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </a>
+      <a href="<?= e(base_url('gallery.php')) ?>">
+        <span class="mobile-nav__ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h11A2.5 2.5 0 0 1 20 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5v-9Z" stroke="currentColor" stroke-width="1.6"/><path d="m7.5 15 2.8-3.2a1 1 0 0 1 1.5 0L14 15l1.2-1.4a1 1 0 0 1 1.5.1L18 16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="9" r="1.2" fill="currentColor"/></svg></span>
+        <span class="mobile-nav__label"><?= e(__('nav_gallery')) ?></span>
+        <span class="mobile-nav__chev" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </a>
+      <a href="<?= e(base_url('reservation.php')) ?>">
+        <span class="mobile-nav__ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 3v4M16 3v4M4 10h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
+        <span class="mobile-nav__label"><?= e(__('nav_reservation')) ?></span>
+        <span class="mobile-nav__chev" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </a>
+      <a href="<?= e(base_url('contacts.php')) ?>">
+        <span class="mobile-nav__ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M7 3h3l1.5 4-2 1.5a12 12 0 0 0 5 5L16 11.5 20 13v3a2 2 0 0 1-2.2 2A15 15 0 0 1 5 7.2 2 2 0 0 1 7 3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></span>
+        <span class="mobile-nav__label"><?= e(__('nav_contacts')) ?></span>
+        <span class="mobile-nav__chev" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </a>
+    </nav>
+    <div class="mobile-lang">
+      <?php foreach (['ru' => 'RU', 'en' => 'EN', 'de' => 'DE'] as $code => $label): ?>
+        <a class="<?= $lang === $code ? 'is-active' : '' ?>" href="<?= e(lang_url($code)) ?>"><?= e($label) ?></a>
+      <?php endforeach; ?>
+    </div>
+  </aside>
 
   <?php if ($flash): ?>
     <div class="flash flash-<?= e($flash['type']) ?>" role="status" data-flash>

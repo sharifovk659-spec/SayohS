@@ -157,13 +157,13 @@ body {
   background: rgba(255, 253, 249, 0.88) !important;
 }
 
-.mobile-nav {
-  background: rgba(255, 253, 249, 0.92) !important;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-  border-radius: 22px;
-  box-shadow: var(--glass-shadow);
+.mobile-nav--drawer {
+  background: #ffffff !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+  border-radius: 22px 0 0 22px !important;
+  box-shadow: -12px 0 40px rgba(20, 14, 10, 0.16) !important;
 }
 
 .lang-switch-toggle,

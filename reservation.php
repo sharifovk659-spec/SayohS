@@ -5,7 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/includes/init.php';
 
 $pageTitle = 'Бронирование — ' . ($app['full_name'] ?? $app['name']);
-$pageDescription = 'Забронируйте стол в ресторане Aroma.';
+$pageDescription = 'Забронируйте стол в чайхане Сайёҳ.';
 $bodyClass = 'page-reservation';
 $redirectTo = 'reservation.php';
 $formId = 'page-reservation';
@@ -18,7 +18,7 @@ require __DIR__ . '/includes/header.php';
     <div class="page-hero-inner" data-reveal>
       <p class="eyebrow">Резерв</p>
       <h1>Бронирование стола</h1>
-      <p>Оставьте заявку — администратор подтвердит бронь.</p>
+      <p>Имя и телефон — достаточно. Мы перезвоним и подтвердим бронь.</p>
     </div>
   </div>
 </section>
