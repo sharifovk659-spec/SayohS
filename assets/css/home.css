@@ -118,7 +118,21 @@
 }
 
 .page-home .section {
-  padding: clamp(2.5rem, 5vw, 4.5rem) 0;
+  padding: clamp(1.75rem, 3.5vw, 3rem) 0;
+}
+
+@media (max-width: 640px) {
+  .page-home .section {
+    padding: 1.15rem 0 1.35rem;
+  }
+
+  .page-home .section .section-heading {
+    margin-bottom: 0.85rem;
+  }
+
+  .page-home .categories-section {
+    padding-top: 0.85rem;
+  }
 }
 
 /* ---- Hero premium ---- */
@@ -1019,7 +1033,7 @@
 @media (max-width: 640px) {
   .hero-mobile-banner {
     display: block;
-    margin: 0.35rem 0 0.65rem;
+    margin: 0.2rem 0 0.35rem;
   }
 
   .hero-desktop-only {
@@ -1027,7 +1041,7 @@
   }
 
   .hero--premium {
-    padding: 0.15rem 0 0.35rem;
+    padding: 0.1rem 0 0.15rem;
     overflow: visible;
   }
 
@@ -1180,10 +1194,15 @@
     align-items: center;
     justify-content: center;
     gap: 0.4rem;
-    margin-top: -1.15rem;
+    margin-top: 0.45rem;
+    margin-bottom: 0.1rem;
     position: relative;
     z-index: 3;
     pointer-events: auto;
+  }
+
+  .hero-mobile-banner:has(.hero-mobile-banner__slide--wide.is-active) .hero-mobile-banner__dots {
+    margin-top: 0.4rem;
   }
 
   .hero-mobile-banner__dot {
