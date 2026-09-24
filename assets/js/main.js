@@ -587,14 +587,20 @@
     }
   }
 
-  /* Home mobile hero carousel (banner only) */
+  /* Home mobile hero carousel (banner only) — swipe */
   const heroMobile = document.querySelector('[data-hero-mobile-banner]');
   if (heroMobile) {
+    const viewport = heroMobile.querySelector('[data-hero-mobile-carousel]') || heroMobile;
     const slides = Array.from(heroMobile.querySelectorAll('[data-hero-slide]'));
     const dots = Array.from(heroMobile.querySelectorAll('[data-hero-dot]'));
     let active = slides.findIndex((s) => s.classList.contains('is-active'));
     if (active < 0) active = 0;
     let timer = null;
+    let pointerId = null;
+    let startX = 0;
+    let startY = 0;
+    let swiping = false;
+    let locked = null; // 'x' | 'y' | null
 
     const showSlide = (index) => {
       if (!slides.length) return;
@@ -614,6 +620,7 @@
 
     const restart = () => {
       if (timer) window.clearInterval(timer);
+      if (slides.length < 2) return;
       timer = window.setInterval(() => showSlide(active + 1), 5500);
     };
 
@@ -627,13 +634,101 @@
       });
     });
 
-    heroMobile.addEventListener('pointerdown', () => {
+    viewport.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      if (e.target.closest('a, button')) return;
+      pointerId = e.pointerId;
+      startX = e.clientX;
+      startY = e.clientY;
+      swiping = true;
+      locked = null;
       if (timer) window.clearInterval(timer);
+      try { viewport.setPointerCapture(e.pointerId); } catch (_) {}
+      viewport.classList.add('is-swiping');
     });
-    heroMobile.addEventListener('pointerup', restart);
-    heroMobile.addEventListener('pointerleave', restart);
+
+    viewport.addEventListener('pointermove', (e) => {
+      if (!swiping || e.pointerId !== pointerId) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      if (!locked && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
+        locked = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+      }
+      if (locked === 'x' && e.cancelable) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    const endSwipe = (e) => {
+      if (!swiping || (pointerId !== null && e.pointerId !== pointerId)) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      swiping = false;
+      pointerId = null;
+      viewport.classList.remove('is-swiping');
+      try { viewport.releasePointerCapture(e.pointerId); } catch (_) {}
+
+      if (locked === 'x' && Math.abs(dx) > 36 && Math.abs(dx) > Math.abs(dy)) {
+        showSlide(active + (dx < 0 ? 1 : -1));
+      }
+      locked = null;
+      restart();
+    };
+
+    viewport.addEventListener('pointerup', endSwipe);
+    viewport.addEventListener('pointercancel', endSwipe);
 
     restart();
+  }
+
+  /* Home categories — finger drag / swipe on phone */
+  if (catTrack && catSlider) {
+    const catViewport = catSlider.querySelector('.categories-viewport') || catTrack.parentElement;
+    if (catViewport) {
+      let catDown = false;
+      let catStartX = 0;
+      let catScrollLeft = 0;
+      let catMoved = false;
+
+      catViewport.addEventListener('pointerdown', (e) => {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        catDown = true;
+        catMoved = false;
+        catStartX = e.clientX;
+        catScrollLeft = catViewport.scrollLeft;
+        catSlider.classList.add('is-paused');
+        catViewport.classList.add('is-dragging');
+        try { catViewport.setPointerCapture(e.pointerId); } catch (_) {}
+      });
+
+      catViewport.addEventListener('pointermove', (e) => {
+        if (!catDown) return;
+        const dx = e.clientX - catStartX;
+        if (Math.abs(dx) > 4) catMoved = true;
+        // When marquee is off (mobile CSS), scroll; otherwise nudge transform via scroll fallback
+        catViewport.scrollLeft = catScrollLeft - dx;
+      });
+
+      const endCatDrag = (e) => {
+        if (!catDown) return;
+        catDown = false;
+        catViewport.classList.remove('is-dragging');
+        try { catViewport.releasePointerCapture(e.pointerId); } catch (_) {}
+        window.setTimeout(() => catSlider.classList.remove('is-paused'), 1200);
+      };
+
+      catViewport.addEventListener('pointerup', endCatDrag);
+      catViewport.addEventListener('pointercancel', endCatDrag);
+
+      catViewport.addEventListener('click', (e) => {
+        if (!catMoved) return;
+        const link = e.target.closest('a');
+        if (link) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }, true);
+    }
   }
 
 })();

@@ -1026,14 +1026,26 @@
 }
 
 /* ---- Mobile home banner (mockup) ---- */
+.hero-mobile-banner-wrap {
+  display: none;
+}
+
 .hero-mobile-banner {
   display: none;
 }
 
 @media (max-width: 640px) {
+  .hero-mobile-banner-wrap {
+    display: block;
+  }
+
   .hero-mobile-banner {
     display: block;
     margin: 0.2rem 0 0.35rem;
+    width: 100%;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
   }
 
   .hero-desktop-only {
@@ -1048,6 +1060,42 @@
   .hero-mobile-banner__viewport {
     position: relative;
     min-height: 168px;
+    touch-action: pan-y;
+    cursor: grab;
+  }
+
+  .hero-mobile-banner__viewport.is-swiping {
+    cursor: grabbing;
+  }
+
+  /* Categories: finger swipe instead of auto-marquee on phone */
+  .page-home .categories-viewport {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+    scrollbar-width: none;
+    cursor: grab;
+  }
+
+  .page-home .categories-viewport::-webkit-scrollbar {
+    display: none;
+  }
+
+  .page-home .categories-viewport.is-dragging {
+    cursor: grabbing;
+    scroll-behavior: auto;
+  }
+
+  .page-home .categories-track--marquee {
+    animation: none !important;
+    transform: none !important;
+    width: max-content;
+    gap: 0.55rem;
+  }
+
+  .page-home .categories-slider.is-paused .categories-track--marquee {
+    animation: none !important;
   }
 
   .hero-mobile-banner__slide {

@@ -149,6 +149,7 @@ require __DIR__ . '/includes/header.php';
 ?>
 
 <section class="hero hero--premium" aria-label="<?= e($heroTitle) ?>">
+  <div class="container hero-mobile-banner-wrap">
   <div class="hero-mobile-banner" data-hero-mobile-banner>
     <div class="hero-mobile-banner__viewport" data-hero-mobile-carousel>
       <?php foreach ($mobileHeroSlides as $i => $slide): ?>
@@ -219,6 +220,7 @@ require __DIR__ . '/includes/header.php';
       ></button>
       <?php endforeach; ?>
     </div>
+  </div>
   </div>
 
   <div class="hero-desktop-only">
