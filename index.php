@@ -44,32 +44,64 @@ $formId = 'home-reservation';
 
 $mobileHeroSlides = [
     [
-        'label' => __('hero_mb_label_1'),
-        'title' => __('hero_mb_title_1'),
-        'sub' => __('hero_mb_sub_1'),
-        'img' => home_banner_image_url(null, 'banner/mobile-hero-salmon.png'),
-        'alt' => __('hero_mb_title_1'),
+        'label' => 'Вкусные блюда',
+        'title' => 'Восточный плов',
+        'sub' => 'Ароматный рис, мясо и специи каждый день',
+        'img' => home_banner_image_url('baneri-1.png', 'banner/mobile-hero-salmon.png'),
+        'alt' => 'Восточный плов',
+        'wide' => true,
+        'overlay' => false,
+        'theme' => 'light',
+        'cta_href' => base_url('menu.php'),
+        'cta_label' => __('hero_menu_btn'),
     ],
     [
-        'label' => __('hero_mb_label_2'),
-        'title' => __('hero_mb_title_2'),
-        'sub' => __('hero_mb_sub_2'),
-        'img' => $heroPlateSrc,
-        'alt' => $heroTitle,
+        'label' => 'Настоящий вкус',
+        'title' => 'Шашлык как искусство',
+        'sub' => 'Сочное мясо. Ароматный дым. Незабываемый вкус.',
+        'img' => home_banner_image_url('baneri-2.png', 'banner/plate-cut.png'),
+        'alt' => 'Шашлык как искусство',
+        'wide' => true,
+        'overlay' => false,
+        'theme' => 'dark',
+        'cta_href' => base_url('menu.php'),
+        'cta_label' => __('hero_menu_btn'),
     ],
     [
-        'label' => __('hero_mb_label_3'),
-        'title' => __('hero_mb_title_3'),
-        'sub' => __('hero_mb_sub_3'),
-        'img' => hero_image_url(setting('hero_image')),
-        'alt' => (string) ($app['full_name'] ?? $app['name']),
+        'label' => 'Душевные встречи',
+        'title' => 'Чай, который собирает друзей',
+        'sub' => 'Ароматный чай и любимые блюда в уютной атмосфере',
+        'img' => home_banner_image_url('baneri-3.png', 'banner/mobile-hero-salmon.png'),
+        'alt' => 'Чай, который собирает друзей',
+        'wide' => true,
+        'overlay' => false,
+        'theme' => 'light',
+        'cta_href' => base_url('reservation.php'),
+        'cta_label' => __('hero_book_btn'),
     ],
     [
-        'label' => __('hero_mb_label_4'),
-        'title' => __('hero_mb_title_4'),
-        'sub' => __('hero_mb_sub_4'),
-        'img' => home_banner_image_url(null, 'banner/mobile-hero-salmon.png'),
-        'alt' => __('hero_mb_title_4'),
+        'label' => 'Полезно и вкусно',
+        'title' => 'Салаты и лёгкие блюда',
+        'sub' => 'Забота о вашем здоровье',
+        'img' => home_banner_image_url('baneri-4.png', 'banner/mobile-hero-salmon.png'),
+        'alt' => 'Салаты и лёгкие блюда',
+        'wide' => true,
+        'overlay' => false,
+        'theme' => 'light',
+        'cta_href' => base_url('menu.php'),
+        'cta_label' => __('hero_menu_btn'),
+    ],
+    [
+        'label' => 'Любимые десерты',
+        'title' => 'Сладкие моменты',
+        'sub' => 'Десерты, которые делают день ярче',
+        'img' => home_banner_image_url('baneri-5.png', 'banner/mobile-hero-salmon.png'),
+        'alt' => 'Сладкие моменты',
+        'wide' => true,
+        'overlay' => false,
+        'theme' => 'light',
+        'cta_href' => base_url('menu.php'),
+        'cta_label' => __('hero_menu_btn'),
     ],
 ];
 
@@ -77,29 +109,33 @@ $dbMobileBanners = fetch_home_banners(true);
 if ($dbMobileBanners !== []) {
     $mobileHeroSlides = [];
     foreach ($dbMobileBanners as $i => $bannerRow) {
-        $fallback = [
-            'banner/mobile-hero-salmon.png',
-            'banner/plate-cut.png',
-            'hero/hero-main.webp',
-            'banner/mobile-hero-salmon.png',
+        $fallbackFiles = [
+            'baneri-1.png',
+            'baneri-2.png',
+            'baneri-3.png',
+            'baneri-4.png',
+            'baneri-5.png',
         ];
-        $fallbackPath = $fallback[$i] ?? $fallback[0];
+        $fallbackFile = $fallbackFiles[$i] ?? $fallbackFiles[0];
         $titleText = trim((string) ($bannerRow['title'] ?? ''));
         $imageFile = (string) ($bannerRow['image'] ?? '');
-        $hasUpload = $imageFile !== '';
+        $hasUpload = $imageFile !== '' && is_file(__DIR__ . '/uploads/banners/' . basename($imageFile));
+        if (!$hasUpload && $imageFile === '') {
+            $imageFile = $fallbackFile;
+            $hasUpload = is_file(__DIR__ . '/uploads/banners/' . $fallbackFile);
+        }
         $sort = (int) ($bannerRow['sort_order'] ?? ($i + 1));
-        // Dark photo slides (shashlik / fire) need light text; others match cream mockup
         $theme = (str_contains($imageFile, 'baneri-2') || $sort === 2) ? 'dark' : 'light';
         $ctaBook = str_contains($imageFile, 'baneri-3') || $sort === 3
             || str_contains(mb_strtolower($titleText), 'чай');
         $showText = (int) ($bannerRow['show_text'] ?? 1) === 1;
         $mobileHeroSlides[] = [
-            'label' => trim((string) ($bannerRow['label'] ?? '')) ?: __('hero_mb_label_1'),
-            'title' => $titleText !== '' ? $titleText : __('hero_mb_title_1'),
-            'sub' => trim((string) ($bannerRow['subtitle'] ?? '')) ?: __('hero_mb_sub_1'),
-            'img' => home_banner_image_url($bannerRow['image'] ?? null, $fallbackPath),
-            'alt' => $titleText !== '' ? $titleText : __('hero_mb_title_1'),
-            'wide' => $hasUpload,
+            'label' => trim((string) ($bannerRow['label'] ?? '')) ?: 'Вкусные блюда',
+            'title' => $titleText !== '' ? $titleText : 'Восточный плов',
+            'sub' => trim((string) ($bannerRow['subtitle'] ?? '')) ?: '',
+            'img' => home_banner_image_url($imageFile !== '' ? $imageFile : $fallbackFile, 'banner/mobile-hero-salmon.png'),
+            'alt' => $titleText !== '' ? $titleText : 'Восточный плов',
+            'wide' => $hasUpload || str_starts_with($fallbackFile, 'baneri-'),
             'overlay' => $hasUpload && $showText,
             'theme' => $theme,
             'cta_href' => $ctaBook ? base_url('reservation.php') : base_url('menu.php'),

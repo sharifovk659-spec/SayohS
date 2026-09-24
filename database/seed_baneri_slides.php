@@ -1,6 +1,8 @@
 <?php
+
 declare(strict_types=1);
-require __DIR__ . '/includes/bootstrap.php';
+
+require __DIR__ . '/../includes/bootstrap.php';
 
 ensure_home_banners_show_text_column();
 
