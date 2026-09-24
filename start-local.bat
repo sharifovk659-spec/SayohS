@@ -7,6 +7,8 @@ if not exist "config\database.php" (
   echo Created config\database.php
 )
 
+call "%~dp0start-mysql.bat"
+
 echo.
 echo Sayoh site: http://127.0.0.1:8080/
 echo Admin:      http://127.0.0.1:8080/admin/login.php
