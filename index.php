@@ -87,6 +87,11 @@ if ($dbMobileBanners !== []) {
         $titleText = trim((string) ($bannerRow['title'] ?? ''));
         $imageFile = (string) ($bannerRow['image'] ?? '');
         $hasUpload = $imageFile !== '';
+        $sort = (int) ($bannerRow['sort_order'] ?? ($i + 1));
+        // Dark photo slides (shashlik / fire) need light text; others match cream mockup
+        $theme = (str_contains($imageFile, 'baneri-2') || $sort === 2) ? 'dark' : 'light';
+        $ctaBook = str_contains($imageFile, 'baneri-3') || $sort === 3
+            || str_contains(mb_strtolower($titleText), 'чай');
         $mobileHeroSlides[] = [
             'label' => trim((string) ($bannerRow['label'] ?? '')) ?: __('hero_mb_label_1'),
             'title' => $titleText !== '' ? $titleText : __('hero_mb_title_1'),
@@ -95,7 +100,10 @@ if ($dbMobileBanners !== []) {
             'alt' => $titleText !== '' ? $titleText : __('hero_mb_title_1'),
             'wide' => $hasUpload,
             'overlay' => $hasUpload,
-            'hide_dots' => str_contains($imageFile, 'test-banner-phone'),
+            'theme' => $theme,
+            'cta_href' => $ctaBook ? base_url('reservation.php') : base_url('menu.php'),
+            'cta_label' => $ctaBook ? __('hero_book_btn') : __('hero_menu_btn'),
+            'hide_dots' => false,
         ];
     }
 }
@@ -110,9 +118,12 @@ require __DIR__ . '/includes/header.php';
       <?php
       $slideWide = !empty($slide['wide']);
       $slideOverlay = !empty($slide['overlay']);
+      $slideTheme = (string) ($slide['theme'] ?? 'light');
+      $ctaHref = (string) ($slide['cta_href'] ?? base_url('menu.php'));
+      $ctaLabel = (string) ($slide['cta_label'] ?? __('hero_menu_btn'));
       ?>
       <article
-        class="hero-mobile-banner__slide<?= $i === 0 ? ' is-active' : '' ?><?= $slideWide ? ' hero-mobile-banner__slide--wide' : '' ?><?= !empty($slide['hide_dots']) ? ' hero-mobile-banner__slide--hide-dots' : '' ?>"
+        class="hero-mobile-banner__slide<?= $i === 0 ? ' is-active' : '' ?><?= $slideWide ? ' hero-mobile-banner__slide--wide' : '' ?> hero-mobile-banner__slide--<?= e($slideTheme) ?>"
         data-hero-slide="<?= (int) $i ?>"
         aria-hidden="<?= $i === 0 ? 'false' : 'true' ?>"
       >
@@ -133,8 +144,8 @@ require __DIR__ . '/includes/header.php';
             <p class="hero-mobile-banner__label"><span class="hero-mobile-banner__label-line" aria-hidden="true"></span><?= e($slide['label']) ?></p>
             <h2 class="hero-mobile-banner__title"><?= e($slide['title']) ?></h2>
             <p class="hero-mobile-banner__sub"><?= e($slide['sub']) ?></p>
-            <a class="hero-mobile-banner__cta" href="<?= e(base_url('menu.php')) ?>">
-              <?= e(__('hero_menu_btn')) ?>
+            <a class="hero-mobile-banner__cta" href="<?= e($ctaHref) ?>">
+              <?= e($ctaLabel) ?>
               <span aria-hidden="true">→</span>
             </a>
           </div>
@@ -146,8 +157,8 @@ require __DIR__ . '/includes/header.php';
             <p class="hero-mobile-banner__label"><span class="hero-mobile-banner__label-line" aria-hidden="true"></span><?= e($slide['label']) ?></p>
             <h2 class="hero-mobile-banner__title"><?= e($slide['title']) ?></h2>
             <p class="hero-mobile-banner__sub"><?= e($slide['sub']) ?></p>
-            <a class="hero-mobile-banner__cta" href="<?= e(base_url('menu.php')) ?>">
-              <?= e(__('hero_menu_btn')) ?>
+            <a class="hero-mobile-banner__cta" href="<?= e($ctaHref) ?>">
+              <?= e($ctaLabel) ?>
               <span aria-hidden="true">→</span>
             </a>
           </div>

@@ -1224,10 +1224,20 @@
     pointer-events: none;
     background: linear-gradient(
       90deg,
-      rgba(247, 239, 228, 0.94) 0%,
-      rgba(247, 239, 228, 0.72) 38%,
-      rgba(247, 239, 228, 0.08) 58%,
-      transparent 72%
+      rgba(247, 239, 228, 0.92) 0%,
+      rgba(247, 239, 228, 0.78) 34%,
+      rgba(247, 239, 228, 0.2) 55%,
+      transparent 70%
+    );
+  }
+
+  .hero-mobile-banner__slide--dark .hero-mobile-banner__inner--overlay::before {
+    background: linear-gradient(
+      90deg,
+      rgba(28, 16, 10, 0.88) 0%,
+      rgba(28, 16, 10, 0.62) 36%,
+      rgba(28, 16, 10, 0.15) 58%,
+      transparent 74%
     );
   }
 
@@ -1273,34 +1283,71 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    width: min(58%, 13.5rem);
-    padding: 0.85rem 0.75rem 0.95rem;
+    align-items: flex-start;
+    width: min(62%, 14.5rem);
+    padding: 0.85rem 0.8rem 1rem;
     pointer-events: auto;
   }
 
+  .hero-mobile-banner__copy--overlay .hero-mobile-banner__label {
+    color: #9a7a3a;
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.28rem;
+  }
+
+  .hero-mobile-banner__copy--overlay .hero-mobile-banner__label-line {
+    background: linear-gradient(90deg, #9a7a3a, rgba(154, 122, 58, 0.15));
+  }
+
   .hero-mobile-banner__copy--overlay .hero-mobile-banner__title {
-    font-size: clamp(1.15rem, 5.2vw, 1.55rem);
-    max-width: 12ch;
+    font-size: clamp(1.2rem, 5.4vw, 1.62rem);
+    max-width: 11ch;
+    color: #2a1810;
+    margin-bottom: 0.28rem;
+    line-height: 1.08;
   }
 
   .hero-mobile-banner__copy--overlay .hero-mobile-banner__sub {
     font-size: 0.72rem;
-    margin-bottom: 0.5rem;
-    max-width: 16ch;
+    margin-bottom: 0.55rem;
+    max-width: 18ch;
+    color: #5c4638;
+    line-height: 1.35;
   }
 
   .hero-mobile-banner__copy--overlay .hero-mobile-banner__cta {
     min-height: 34px;
-    padding: 0.4rem 0.75rem;
+    padding: 0.4rem 0.85rem;
     font-size: 0.72rem;
+    background: #2a1810;
+    color: #fff;
+  }
+
+  /* Dark slides (shashlik / fire) — like mockup */
+  .hero-mobile-banner__slide--dark .hero-mobile-banner__copy--overlay .hero-mobile-banner__label {
+    color: rgba(255, 236, 210, 0.92);
+  }
+
+  .hero-mobile-banner__slide--dark .hero-mobile-banner__copy--overlay .hero-mobile-banner__label-line {
+    background: linear-gradient(90deg, rgba(255, 236, 210, 0.95), rgba(255, 236, 210, 0.15));
+  }
+
+  .hero-mobile-banner__slide--dark .hero-mobile-banner__copy--overlay .hero-mobile-banner__title {
+    color: #fff;
+  }
+
+  .hero-mobile-banner__slide--dark .hero-mobile-banner__copy--overlay .hero-mobile-banner__sub {
+    color: rgba(255, 245, 235, 0.9);
+  }
+
+  .hero-mobile-banner__slide--dark .hero-mobile-banner__copy--overlay .hero-mobile-banner__cta {
+    background: #fff;
+    color: #2a1810;
   }
 
   .hero-mobile-banner__viewport:has(.hero-mobile-banner__slide--wide.is-active) {
     min-height: 0;
-  }
-
-  .hero-mobile-banner:has(.hero-mobile-banner__slide--hide-dots.is-active) .hero-mobile-banner__dots {
-    display: none;
   }
 }
 
