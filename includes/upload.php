@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 /**
  * Secure image upload helper.
+ * Accepts JPG / JPEG / PNG / WebP / GIF from phone or PC.
+ * Any pixel size is OK — oversized files are only downscaled (never cropped).
  *
  * @return array{ok:bool,file?:string,error?:string}
  */
@@ -14,17 +16,25 @@ function upload_image(array $file, string $folder, ?string $oldFile = null): arr
         return ['ok' => false, 'error' => 'Недопустимая папка загрузки.'];
     }
 
-    if (($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+    $errCode = (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE);
+    if ($errCode === UPLOAD_ERR_NO_FILE) {
         return ['ok' => false, 'error' => 'Файл не выбран.'];
     }
-
-    if (($file['error'] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK) {
-        return ['ok' => false, 'error' => 'Ошибка загрузки файла.'];
+    if ($errCode === UPLOAD_ERR_INI_SIZE || $errCode === UPLOAD_ERR_FORM_SIZE) {
+        return ['ok' => false, 'error' => 'Файл слишком большой для сервера. Уменьшите фото или сохраните как JPG/WebP.'];
+    }
+    if ($errCode !== UPLOAD_ERR_OK) {
+        return ['ok' => false, 'error' => 'Ошибка загрузки файла (код ' . $errCode . ').'];
     }
 
-    $maxBytes = $folder === 'banners' ? (8 * 1024 * 1024) : (5 * 1024 * 1024);
-    if (($file['size'] ?? 0) <= 0 || (int) $file['size'] > $maxBytes) {
-        return ['ok' => false, 'error' => 'Размер файла не должен превышать 5 МБ.'];
+    $maxMb = $folder === 'banners' ? 12 : 5;
+    $maxBytes = $maxMb * 1024 * 1024;
+    $size = (int) ($file['size'] ?? 0);
+    if ($size <= 0) {
+        return ['ok' => false, 'error' => 'Пустой файл.'];
+    }
+    if ($size > $maxBytes) {
+        return ['ok' => false, 'error' => 'Размер файла не должен превышать ' . $maxMb . ' МБ.'];
     }
 
     $tmp = (string) ($file['tmp_name'] ?? '');
@@ -34,34 +44,34 @@ function upload_image(array $file, string $folder, ?string $oldFile = null): arr
 
     $info = @getimagesize($tmp);
     if ($info === false) {
-        return ['ok' => false, 'error' => 'Файл не является изображением.'];
+        return ['ok' => false, 'error' => 'Это не изображение. Используйте JPG, PNG, WebP или GIF (не HEIC).'];
     }
 
-    $mime = $info['mime'] ?? '';
+    $mime = strtolower((string) ($info['mime'] ?? ''));
     $allowedMimes = [
         'image/jpeg' => 'jpg',
+        'image/pjpeg' => 'jpg',
         'image/png' => 'png',
         'image/webp' => 'webp',
+        'image/gif' => 'gif',
     ];
     if (!isset($allowedMimes[$mime])) {
-        return ['ok' => false, 'error' => 'Разрешены только JPG, PNG и WebP.'];
+        return ['ok' => false, 'error' => 'Разрешены JPG, PNG, WebP и GIF. HEIC с iPhone сохраните как JPG.'];
     }
 
-    $origName = (string) ($file['name'] ?? '');
-    $ext = strtolower(pathinfo($origName, PATHINFO_EXTENSION));
-    if ($ext === 'jpeg') {
-        $ext = 'jpg';
-    }
-    if (!in_array($ext, ['jpg', 'jpeg', 'png', 'webp'], true)) {
-        return ['ok' => false, 'error' => 'Недопустимое расширение файла.'];
-    }
-
-    // Prefer MIME-derived extension
+    // Trust MIME over filename (phone cameras often use odd names / no extension)
     $ext = $allowedMimes[$mime];
 
     $dir = realpath(__DIR__ . '/../uploads');
     if ($dir === false) {
-        return ['ok' => false, 'error' => 'Папка uploads недоступна.'];
+        $uploadsPath = __DIR__ . '/../uploads';
+        if (!is_dir($uploadsPath) && !@mkdir($uploadsPath, 0775, true)) {
+            return ['ok' => false, 'error' => 'Папка uploads недоступна.'];
+        }
+        $dir = realpath($uploadsPath);
+        if ($dir === false) {
+            return ['ok' => false, 'error' => 'Папка uploads недоступна.'];
+        }
     }
 
     $targetDir = $dir . DIRECTORY_SEPARATOR . $folder;
@@ -77,17 +87,18 @@ function upload_image(array $file, string $folder, ?string $oldFile = null): arr
     $newName = bin2hex(random_bytes(16)) . '.' . $ext;
     $dest = $targetReal . DIRECTORY_SEPARATOR . $newName;
 
-    // Resize / optional WebP
-    $maxWidth = $folder === 'banners' ? 960 : 1600;
-    $maxHeight = $folder === 'banners' ? 960 : 0;
+    // Downscale only if huge — never crop, any ratio (wide / tall / square) is fine
+    $maxWidth = $folder === 'banners' ? 1600 : 1600;
+    $maxHeight = $folder === 'banners' ? 1200 : 0;
     $saved = false;
-    $keepPngAlpha = $folder === 'banners' && $mime === 'image/png';
+    $preserveAlpha = in_array($mime, ['image/png', 'image/webp', 'image/gif'], true);
 
     if (extension_loaded('gd')) {
         $src = match ($mime) {
-            'image/jpeg' => @imagecreatefromjpeg($tmp),
+            'image/jpeg', 'image/pjpeg' => @imagecreatefromjpeg($tmp),
             'image/png' => @imagecreatefrompng($tmp),
             'image/webp' => function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($tmp) : false,
+            'image/gif' => @imagecreatefromgif($tmp),
             default => false,
         };
 
@@ -95,16 +106,18 @@ function upload_image(array $file, string $folder, ?string $oldFile = null): arr
             $w = imagesx($src);
             $h = imagesy($src);
             $scale = 1.0;
-            if ($maxHeight > 0 && ($w > $maxWidth || $h > $maxHeight)) {
-                $scale = min($maxWidth / max(1, $w), $maxHeight / max(1, $h));
-            } elseif ($w > $maxWidth) {
-                $scale = $maxWidth / max(1, $w);
+            if ($w > $maxWidth) {
+                $scale = min($scale, $maxWidth / max(1, $w));
             }
+            if ($maxHeight > 0 && $h > $maxHeight) {
+                $scale = min($scale, $maxHeight / max(1, $h));
+            }
+
             if ($scale < 1.0) {
                 $nw = (int) max(1, round($w * $scale));
                 $nh = (int) max(1, round($h * $scale));
                 $dst = imagecreatetruecolor($nw, $nh);
-                if ($mime === 'image/png' || $mime === 'image/webp') {
+                if ($preserveAlpha) {
                     imagealphablending($dst, false);
                     imagesavealpha($dst, true);
                     $transparent = imagecolorallocatealpha($dst, 0, 0, 0, 127);
@@ -117,10 +130,12 @@ function upload_image(array $file, string $folder, ?string $oldFile = null): arr
                 $src = $dst;
             }
 
-            if (function_exists('imagewebp') && !$keepPngAlpha) {
+            // Keep PNG/GIF as-is (alpha). Convert JPG → WebP when possible for size.
+            $convertToWebp = !$preserveAlpha && function_exists('imagewebp') && $folder === 'banners';
+            if ($convertToWebp) {
                 $webpName = pathinfo($newName, PATHINFO_FILENAME) . '.webp';
                 $webpPath = $targetReal . DIRECTORY_SEPARATOR . $webpName;
-                if (@imagewebp($src, $webpPath, 82)) {
+                if (@imagewebp($src, $webpPath, 85)) {
                     $newName = $webpName;
                     $dest = $webpPath;
                     $saved = true;
@@ -129,9 +144,10 @@ function upload_image(array $file, string $folder, ?string $oldFile = null): arr
 
             if (!$saved) {
                 $ok = match ($ext) {
-                    'jpg' => @imagejpeg($src, $dest, 85),
+                    'jpg' => @imagejpeg($src, $dest, 88),
                     'png' => @imagepng($src, $dest, 6),
-                    'webp' => function_exists('imagewebp') ? @imagewebp($src, $dest, 82) : false,
+                    'webp' => function_exists('imagewebp') ? @imagewebp($src, $dest, 85) : false,
+                    'gif' => @imagegif($src, $dest),
                     default => false,
                 };
                 $saved = (bool) $ok;
@@ -141,12 +157,12 @@ function upload_image(array $file, string $folder, ?string $oldFile = null): arr
     }
 
     if (!$saved) {
-        if (!move_uploaded_file($tmp, $dest)) {
+        if (!@move_uploaded_file($tmp, $dest)) {
             return ['ok' => false, 'error' => 'Не удалось сохранить файл.'];
         }
     }
 
-    if ($oldFile) {
+    if ($oldFile !== null && $oldFile !== '' && $oldFile !== $newName) {
         delete_upload($folder, $oldFile);
     }
 

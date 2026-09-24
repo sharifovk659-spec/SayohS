@@ -85,12 +85,17 @@ if ($dbMobileBanners !== []) {
         ];
         $fallbackPath = $fallback[$i] ?? $fallback[0];
         $titleText = trim((string) ($bannerRow['title'] ?? ''));
+        $imageFile = (string) ($bannerRow['image'] ?? '');
+        $hasUpload = $imageFile !== '';
         $mobileHeroSlides[] = [
             'label' => trim((string) ($bannerRow['label'] ?? '')) ?: __('hero_mb_label_1'),
             'title' => $titleText !== '' ? $titleText : __('hero_mb_title_1'),
             'sub' => trim((string) ($bannerRow['subtitle'] ?? '')) ?: __('hero_mb_sub_1'),
             'img' => home_banner_image_url($bannerRow['image'] ?? null, $fallbackPath),
             'alt' => $titleText !== '' ? $titleText : __('hero_mb_title_1'),
+            'wide' => $hasUpload,
+            'overlay' => $hasUpload,
+            'hide_dots' => str_contains($imageFile, 'test-banner-phone'),
         ];
     }
 }
@@ -102,11 +107,40 @@ require __DIR__ . '/includes/header.php';
   <div class="hero-mobile-banner" data-hero-mobile-banner>
     <div class="hero-mobile-banner__viewport" data-hero-mobile-carousel>
       <?php foreach ($mobileHeroSlides as $i => $slide): ?>
+      <?php
+      $slideWide = !empty($slide['wide']);
+      $slideOverlay = !empty($slide['overlay']);
+      ?>
       <article
-        class="hero-mobile-banner__slide<?= $i === 0 ? ' is-active' : '' ?>"
+        class="hero-mobile-banner__slide<?= $i === 0 ? ' is-active' : '' ?><?= $slideWide ? ' hero-mobile-banner__slide--wide' : '' ?><?= !empty($slide['hide_dots']) ? ' hero-mobile-banner__slide--hide-dots' : '' ?>"
         data-hero-slide="<?= (int) $i ?>"
         aria-hidden="<?= $i === 0 ? 'false' : 'true' ?>"
       >
+        <?php if ($slideWide): ?>
+        <div class="hero-mobile-banner__inner hero-mobile-banner__inner--wide<?= $slideOverlay ? ' hero-mobile-banner__inner--overlay' : '' ?>">
+          <div class="hero-mobile-banner__media hero-mobile-banner__media--wide">
+            <img
+              src="<?= e($slide['img']) ?>"
+              alt="<?= e($slide['alt']) ?>"
+              width="1080"
+              height="502"
+              loading="<?= $i === 0 ? 'eager' : 'lazy' ?>"
+              decoding="async"
+            >
+          </div>
+          <?php if ($slideOverlay): ?>
+          <div class="hero-mobile-banner__copy hero-mobile-banner__copy--overlay">
+            <p class="hero-mobile-banner__label"><span class="hero-mobile-banner__label-line" aria-hidden="true"></span><?= e($slide['label']) ?></p>
+            <h2 class="hero-mobile-banner__title"><?= e($slide['title']) ?></h2>
+            <p class="hero-mobile-banner__sub"><?= e($slide['sub']) ?></p>
+            <a class="hero-mobile-banner__cta" href="<?= e(base_url('menu.php')) ?>">
+              <?= e(__('hero_menu_btn')) ?>
+              <span aria-hidden="true">→</span>
+            </a>
+          </div>
+          <?php endif; ?>
+        </div>
+        <?php else: ?>
         <div class="hero-mobile-banner__inner">
           <div class="hero-mobile-banner__copy">
             <p class="hero-mobile-banner__label"><span class="hero-mobile-banner__label-line" aria-hidden="true"></span><?= e($slide['label']) ?></p>
@@ -121,6 +155,7 @@ require __DIR__ . '/includes/header.php';
             <img src="<?= e($slide['img']) ?>" alt="<?= e($slide['alt']) ?>" width="220" height="200" loading="<?= $i === 0 ? 'eager' : 'lazy' ?>" decoding="async">
           </div>
         </div>
+        <?php endif; ?>
       </article>
       <?php endforeach; ?>
     </div>
