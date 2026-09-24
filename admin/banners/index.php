@@ -8,6 +8,7 @@ require_admin();
 $adminPageTitle = 'Баннер на главной (моб.)';
 $adminActive = 'banners';
 
+ensure_home_banners_show_text_column();
 $rows = fetch_home_banners(false);
 
 require __DIR__ . '/../includes/admin-header.php';
@@ -17,7 +18,7 @@ require __DIR__ . '/../includes/admin-header.php';
   <div class="admin-toolbar" style="display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;justify-content:space-between;">
     <div>
       <strong>Баннер телефона</strong>
-      <p class="admin-muted" style="margin:.2rem 0 0;">Слайды на главной (мобильный)</p>
+      <p class="admin-muted" style="margin:.2rem 0 0;">«Текст» выкл = только фото без надписи</p>
     </div>
     <a class="btn btn-sm" href="<?= e(base_url('admin/banners/edit.php')) ?>">+ Добавить слайд</a>
   </div>
@@ -34,6 +35,7 @@ require __DIR__ . '/../includes/admin-header.php';
             <th>Текст</th>
             <th>Порядок</th>
             <th>На сайте</th>
+            <th>Текст на баннере</th>
             <th>Действия</th>
           </tr>
         </thead>
@@ -43,6 +45,7 @@ require __DIR__ . '/../includes/admin-header.php';
             $id = (int) ($row['id'] ?? 0);
             $imgSrc = admin_image_src('banners', $row['image'] ?? null, 'banner');
             $active = (int) ($row['is_active'] ?? 0) === 1;
+            $showText = (int) ($row['show_text'] ?? 1) === 1;
             ?>
             <tr>
               <td><?= $id ?></td>
@@ -58,7 +61,26 @@ require __DIR__ . '/../includes/admin-header.php';
                 <span class="admin-muted"><?= e((string) ($row['label'] ?? '')) ?></span>
               </td>
               <td><?= (int) ($row['sort_order'] ?? 0) ?></td>
-              <td><?= $active ? '✅ Да' : '— Нет' ?></td>
+              <td>
+                <form method="post" action="<?= e(base_url('admin/banners/toggle.php')) ?>" style="margin:0;">
+                  <?= csrf_field() ?>
+                  <input type="hidden" name="id" value="<?= $id ?>">
+                  <input type="hidden" name="field" value="is_active">
+                  <button type="submit" class="btn btn-sm btn-light" title="Вкл/Выкл слайд на сайте">
+                    <?= $active ? '✅ Вкл' : '⬜ Выкл' ?>
+                  </button>
+                </form>
+              </td>
+              <td>
+                <form method="post" action="<?= e(base_url('admin/banners/toggle.php')) ?>" style="margin:0;">
+                  <?= csrf_field() ?>
+                  <input type="hidden" name="id" value="<?= $id ?>">
+                  <input type="hidden" name="field" value="show_text">
+                  <button type="submit" class="btn btn-sm btn-light" title="Скрыть или показать текст поверх фото">
+                    <?= $showText ? '✅ Вкл' : '⬜ Выкл' ?>
+                  </button>
+                </form>
+              </td>
               <td style="white-space:nowrap;">
                 <a class="btn btn-sm btn-light" href="<?= e(base_url('admin/banners/edit.php?id=' . $id)) ?>">Изменить</a>
                 <form method="post" action="<?= e(base_url('admin/banners/delete.php')) ?>" style="display:inline;" onsubmit="return confirm('Удалить слайд #<?= $id ?>?');">

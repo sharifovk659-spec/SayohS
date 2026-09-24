@@ -25,6 +25,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     $subtitle = sanitize_plain($_POST['subtitle'] ?? '');
     $sortOrder = (int) ($_POST['sort_order'] ?? 0);
     $isActive = isset($_POST['is_active']) ? 1 : 0;
+    $showText = isset($_POST['show_text']) ? 1 : 0;
     $errs = [];
 
     if ($title === '') {
@@ -33,6 +34,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 
     if ($errs === []) {
         try {
+            ensure_home_banners_show_text_column();
             $currentImage = is_array($row) ? (string) ($row['image'] ?? '') : '';
             $image = $currentImage;
             $hasNewUpload = !empty($_FILES['image'])
@@ -53,13 +55,14 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 
             if ($id > 0) {
                 $stmt = db()->prepare(
-                    'UPDATE home_banners SET sort_order = :sort_order, is_active = :is_active,
+                    'UPDATE home_banners SET sort_order = :sort_order, is_active = :is_active, show_text = :show_text,
                      label = :label, title = :title, subtitle = :subtitle, image = :image
                      WHERE id = :id'
                 );
                 $stmt->execute([
                     'sort_order' => $sortOrder,
                     'is_active' => $isActive,
+                    'show_text' => $showText,
                     'label' => $label,
                     'title' => $title,
                     'subtitle' => $subtitle,
@@ -68,12 +71,13 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                 ]);
             } else {
                 $stmt = db()->prepare(
-                    'INSERT INTO home_banners (sort_order, is_active, label, title, subtitle, image)
-                     VALUES (:sort_order, :is_active, :label, :title, :subtitle, :image)'
+                    'INSERT INTO home_banners (sort_order, is_active, show_text, label, title, subtitle, image)
+                     VALUES (:sort_order, :is_active, :show_text, :label, :title, :subtitle, :image)'
                 );
                 $stmt->execute([
                     'sort_order' => $sortOrder,
                     'is_active' => $isActive,
+                    'show_text' => $showText,
                     'label' => $label,
                     'title' => $title,
                     'subtitle' => $subtitle,
@@ -94,6 +98,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         'subtitle' => $subtitle,
         'sort_order' => $sortOrder,
         'is_active' => $isActive,
+        'show_text' => $showText,
     ]);
     redirect('admin/banners/edit.php' . ($id > 0 ? '?id=' . $id : ''));
 }
@@ -103,6 +108,7 @@ $title = (string) old('title', is_array($row) ? ($row['title'] ?? '') : '');
 $subtitle = (string) old('subtitle', is_array($row) ? ($row['subtitle'] ?? '') : '');
 $sortOrder = (int) old('sort_order', is_array($row) ? ($row['sort_order'] ?? 0) : 0);
 $isActive = old('is_active', is_array($row) ? (int) ($row['is_active'] ?? 1) : 1);
+$showText = old('show_text', is_array($row) ? (int) ($row['show_text'] ?? 1) : 1);
 $imgSrc = admin_image_src('banners', is_array($row) ? ($row['image'] ?? null) : null, 'banner');
 
 require __DIR__ . '/../includes/admin-header.php';
@@ -138,6 +144,11 @@ require __DIR__ . '/../includes/admin-header.php';
 
     <div class="form-group">
       <label><input type="checkbox" name="is_active" value="1" <?= (int) $isActive === 1 ? 'checked' : '' ?>> Показывать на сайте</label>
+    </div>
+
+    <div class="form-group">
+      <label><input type="checkbox" name="show_text" value="1" <?= (int) $showText === 1 ? 'checked' : '' ?>> Показывать текст на баннере</label>
+      <p class="admin-muted" style="margin:.35rem 0 0;">Снимите галочку (выкл) — на телефоне останется только фото без текста и кнопки.</p>
     </div>
 
     <div class="form-group full">

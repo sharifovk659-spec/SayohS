@@ -601,22 +601,48 @@ function fetch_page(string $pageKey): ?array
 }
 
 /**
+ * Ensure show_text column exists (safe for older DBs).
+ */
+function ensure_home_banners_show_text_column(): void
+{
+    static $done = false;
+    if ($done || !db_available()) {
+        return;
+    }
+    $done = true;
+    try {
+        $cols = db()->query('SHOW COLUMNS FROM home_banners LIKE "show_text"')->fetchAll();
+        if ($cols === []) {
+            db()->exec(
+                'ALTER TABLE home_banners
+                 ADD COLUMN show_text TINYINT(1) NOT NULL DEFAULT 1 AFTER is_active'
+            );
+        }
+    } catch (Throwable $e) {
+        storage_log('ensure_home_banners_show_text_column: ' . $e->getMessage());
+    }
+}
+
+/**
  * @return list<array<string, mixed>>
  */
 function fetch_home_banners(bool $activeOnly = true): array
 {
-    static $cache = null;
-    if (is_array($cache)) {
-        return $cache;
+    static $cache = [];
+    $key = $activeOnly ? '1' : '0';
+    if (isset($cache[$key])) {
+        return $cache[$key];
     }
 
     if (!db_available()) {
-        $cache = [];
-        return $cache;
+        $cache[$key] = [];
+        return $cache[$key];
     }
 
+    ensure_home_banners_show_text_column();
+
     try {
-        $sql = 'SELECT id, sort_order, is_active, label, title, subtitle, image
+        $sql = 'SELECT id, sort_order, is_active, show_text, label, title, subtitle, image
                 FROM home_banners';
         if ($activeOnly) {
             $sql .= ' WHERE is_active = 1';
@@ -624,13 +650,31 @@ function fetch_home_banners(bool $activeOnly = true): array
         $sql .= ' ORDER BY sort_order ASC, id ASC LIMIT 12';
         $stmt = db()->query($sql);
         $rows = $stmt->fetchAll();
-        $cache = is_array($rows) ? $rows : [];
+        $cache[$key] = is_array($rows) ? $rows : [];
     } catch (Throwable $e) {
         storage_log('fetch_home_banners: ' . $e->getMessage());
-        $cache = [];
+        // Fallback without show_text if migration not applied yet
+        try {
+            $sql = 'SELECT id, sort_order, is_active, label, title, subtitle, image
+                    FROM home_banners';
+            if ($activeOnly) {
+                $sql .= ' WHERE is_active = 1';
+            }
+            $sql .= ' ORDER BY sort_order ASC, id ASC LIMIT 12';
+            $stmt = db()->query($sql);
+            $rows = $stmt->fetchAll();
+            $out = [];
+            foreach ((is_array($rows) ? $rows : []) as $r) {
+                $r['show_text'] = 1;
+                $out[] = $r;
+            }
+            $cache[$key] = $out;
+        } catch (Throwable $e2) {
+            $cache[$key] = [];
+        }
     }
 
-    return $cache;
+    return $cache[$key];
 }
 
 /**
@@ -642,9 +686,11 @@ function fetch_home_banner(int $id): ?array
         return null;
     }
 
+    ensure_home_banners_show_text_column();
+
     try {
         $stmt = db()->prepare(
-            'SELECT id, sort_order, is_active, label, title, subtitle, image
+            'SELECT id, sort_order, is_active, show_text, label, title, subtitle, image
              FROM home_banners WHERE id = :id LIMIT 1'
         );
         $stmt->execute(['id' => $id]);
@@ -652,7 +698,20 @@ function fetch_home_banner(int $id): ?array
         return $row ?: null;
     } catch (Throwable $e) {
         storage_log('fetch_home_banner: ' . $e->getMessage());
-        return null;
+        try {
+            $stmt = db()->prepare(
+                'SELECT id, sort_order, is_active, label, title, subtitle, image
+                 FROM home_banners WHERE id = :id LIMIT 1'
+            );
+            $stmt->execute(['id' => $id]);
+            $row = $stmt->fetch();
+            if ($row) {
+                $row['show_text'] = 1;
+            }
+            return $row ?: null;
+        } catch (Throwable $e2) {
+            return null;
+        }
     }
 }
 

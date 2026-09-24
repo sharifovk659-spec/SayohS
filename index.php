@@ -92,6 +92,7 @@ if ($dbMobileBanners !== []) {
         $theme = (str_contains($imageFile, 'baneri-2') || $sort === 2) ? 'dark' : 'light';
         $ctaBook = str_contains($imageFile, 'baneri-3') || $sort === 3
             || str_contains(mb_strtolower($titleText), 'чай');
+        $showText = (int) ($bannerRow['show_text'] ?? 1) === 1;
         $mobileHeroSlides[] = [
             'label' => trim((string) ($bannerRow['label'] ?? '')) ?: __('hero_mb_label_1'),
             'title' => $titleText !== '' ? $titleText : __('hero_mb_title_1'),
@@ -99,7 +100,7 @@ if ($dbMobileBanners !== []) {
             'img' => home_banner_image_url($bannerRow['image'] ?? null, $fallbackPath),
             'alt' => $titleText !== '' ? $titleText : __('hero_mb_title_1'),
             'wide' => $hasUpload,
-            'overlay' => $hasUpload,
+            'overlay' => $hasUpload && $showText,
             'theme' => $theme,
             'cta_href' => $ctaBook ? base_url('reservation.php') : base_url('menu.php'),
             'cta_label' => $ctaBook ? __('hero_book_btn') : __('hero_menu_btn'),
