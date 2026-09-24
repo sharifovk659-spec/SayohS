@@ -17,20 +17,9 @@ require __DIR__ . '/../includes/admin-header.php';
   <div class="admin-toolbar" style="display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;justify-content:space-between;">
     <div>
       <strong>Баннер телефона</strong>
-      <p class="admin-muted" style="margin:.2rem 0 0;">Сурат аз телефон ё ПК → матн аз ин ҷо → дар сайт намоиш</p>
+      <p class="admin-muted" style="margin:.2rem 0 0;">Слайды на главной (мобильный)</p>
     </div>
     <a class="btn btn-sm" href="<?= e(base_url('admin/banners/edit.php')) ?>">+ Добавить слайд</a>
-  </div>
-
-  <div class="banner-help" style="margin:1rem 0;padding:1rem 1.1rem;border-radius:14px;background:#f7f1e8;border:1px solid rgba(42,24,16,.08);">
-    <strong style="display:block;margin-bottom:.4rem;">Қабул мешавад</strong>
-    <ul class="admin-muted" style="margin:0;padding-left:1.1rem;line-height:1.55;">
-      <li><strong>JPG, PNG, WebP, GIF</strong> — аз телефон ё компютер (то 12 МБ)</li>
-      <li>Ҳар андоза: дароз, баланд, майда, квадрат — сайт <strong>пур</strong> мекунад</li>
-      <li>Матн дар сурат набошад — матнро дар «Изменить» нависед</li>
-      <li>Тавсияи идеалӣ: <strong>1080×502 px</strong> (2.15:1)</li>
-      <li>iPhone HEIC → аввал ба JPG табдил диҳед</li>
-    </ul>
   </div>
 
   <?php if ($rows === []): ?>
