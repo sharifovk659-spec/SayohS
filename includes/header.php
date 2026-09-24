@@ -3,30 +3,34 @@
 declare(strict_types=1);
 
 /** @var array $app */
-$pageTitle = $pageTitle ?? (setting('meta_title_default') ?: ($app['full_name'] ?? $app['name']));
-$pageDescription = $pageDescription ?? (setting('meta_description_default') ?: ($app['description'] ?? ''));
+$pageTitle = localize_brand_string(
+    (string) ($pageTitle ?? (setting('meta_title_default') ?: ($app['full_name'] ?? $app['name'])))
+);
+$pageDescription = localize_brand_string(
+    (string) ($pageDescription ?? (setting('meta_description_default') ?: ($app['description'] ?? '')))
+);
 $bodyClass = $bodyClass ?? '';
 $flash = get_flash();
 $ogImage = $pageOgImage ?? hero_image_url(setting('hero_image'));
 $canonicalPath = $pageCanonical ?? ltrim((string) ($_SERVER['SCRIPT_NAME'] ?? 'index.php'), '/');
 if (isset($_SERVER['QUERY_STRING']) && $_SERVER['QUERY_STRING'] !== '' && str_contains($canonicalPath, 'dish.php')) {
     $slug = trim((string) ($_GET['slug'] ?? ''));
-    $canonicalUrl = base_url('dish.php' . ($slug !== '' ? '?slug=' . rawurlencode($slug) : ''));
+    $canonicalUrl = absolute_url('dish.php' . ($slug !== '' ? '?slug=' . rawurlencode($slug) : ''));
 } elseif (($pageCanonicalUrl ?? null) !== null) {
-    $canonicalUrl = (string) $pageCanonicalUrl;
+    $rawCanonical = (string) $pageCanonicalUrl;
+    $canonicalUrl = str_starts_with($rawCanonical, 'http')
+        ? $rawCanonical
+        : absolute_url(ltrim($rawCanonical, '/'));
 } else {
     $script = basename((string) ($_SERVER['SCRIPT_NAME'] ?? 'index.php'));
-    $canonicalUrl = $script === 'index.php' ? base_url() : base_url($script);
+    $canonicalUrl = $script === 'index.php' ? absolute_url() : absolute_url($script);
 }
-$scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-if (!str_starts_with($canonicalUrl, 'http')) {
-    $canonicalUrl = $scheme . '://' . $host . $canonicalUrl;
-}
-if (!str_starts_with($ogImage, 'http')) {
-    $ogImageAbs = $scheme . '://' . $host . $ogImage;
-} else {
+if (str_starts_with($ogImage, 'http')) {
     $ogImageAbs = $ogImage;
+} elseif (str_starts_with($ogImage, '/')) {
+    $ogImageAbs = absolute_url(ltrim($ogImage, '/'));
+} else {
+    $ogImageAbs = absolute_url($ogImage);
 }
 $favicon = setting('favicon') ?: null;
 if ($favicon) {

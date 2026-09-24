@@ -5,7 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/includes/init.php';
 
 $pageTitle = 'Контакты — ' . ($app['full_name'] ?? $app['name']);
-$pageDescription = 'Адрес, телефон и форма связи ресторана Aroma.';
+$pageDescription = 'Адрес, телефон и форма связи ' . site_brand_full() . '.';
 $bodyClass = 'page-contacts';
 $errors = form_errors();
 
@@ -47,7 +47,7 @@ require __DIR__ . '/includes/header.php';
 
         <div class="map-frame">
           <iframe
-            title="Карта ресторана Aroma"
+            title="<?= e('Карта — ' . site_brand_full()) ?>"
             src="<?= e($app['map_embed']) ?>"
             loading="lazy"
             referrerpolicy="no-referrer-when-downgrade"

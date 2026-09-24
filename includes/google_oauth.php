@@ -73,7 +73,7 @@ function google_oauth_client_secret(): string
 
 function google_oauth_redirect_uri(): string
 {
-    return rtrim(base_url('auth-google-callback.php'), '?&');
+    return rtrim(absolute_url('auth-google-callback.php'), '?&');
 }
 
 function google_oauth_http_post(string $url, array $fields): ?array

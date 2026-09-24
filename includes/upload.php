@@ -9,7 +9,7 @@ declare(strict_types=1);
  */
 function upload_image(array $file, string $folder, ?string $oldFile = null): array
 {
-    $allowedFolders = ['dishes', 'categories', 'gallery', 'settings', 'pages'];
+    $allowedFolders = ['dishes', 'categories', 'gallery', 'settings', 'pages', 'banners'];
     if (!in_array($folder, $allowedFolders, true)) {
         return ['ok' => false, 'error' => 'Недопустимая папка загрузки.'];
     }
@@ -22,7 +22,7 @@ function upload_image(array $file, string $folder, ?string $oldFile = null): arr
         return ['ok' => false, 'error' => 'Ошибка загрузки файла.'];
     }
 
-    $maxBytes = 5 * 1024 * 1024;
+    $maxBytes = $folder === 'banners' ? (8 * 1024 * 1024) : (5 * 1024 * 1024);
     if (($file['size'] ?? 0) <= 0 || (int) $file['size'] > $maxBytes) {
         return ['ok' => false, 'error' => 'Размер файла не должен превышать 5 МБ.'];
     }
@@ -78,8 +78,10 @@ function upload_image(array $file, string $folder, ?string $oldFile = null): arr
     $dest = $targetReal . DIRECTORY_SEPARATOR . $newName;
 
     // Resize / optional WebP
-    $maxWidth = 1600;
+    $maxWidth = $folder === 'banners' ? 960 : 1600;
+    $maxHeight = $folder === 'banners' ? 960 : 0;
     $saved = false;
+    $keepPngAlpha = $folder === 'banners' && $mime === 'image/png';
 
     if (extension_loaded('gd')) {
         $src = match ($mime) {
@@ -92,20 +94,30 @@ function upload_image(array $file, string $folder, ?string $oldFile = null): arr
         if ($src !== false) {
             $w = imagesx($src);
             $h = imagesy($src);
-            if ($w > $maxWidth) {
-                $nw = $maxWidth;
-                $nh = (int) max(1, round($h * ($maxWidth / $w)));
+            $scale = 1.0;
+            if ($maxHeight > 0 && ($w > $maxWidth || $h > $maxHeight)) {
+                $scale = min($maxWidth / max(1, $w), $maxHeight / max(1, $h));
+            } elseif ($w > $maxWidth) {
+                $scale = $maxWidth / max(1, $w);
+            }
+            if ($scale < 1.0) {
+                $nw = (int) max(1, round($w * $scale));
+                $nh = (int) max(1, round($h * $scale));
                 $dst = imagecreatetruecolor($nw, $nh);
                 if ($mime === 'image/png' || $mime === 'image/webp') {
                     imagealphablending($dst, false);
                     imagesavealpha($dst, true);
+                    $transparent = imagecolorallocatealpha($dst, 0, 0, 0, 127);
+                    if ($transparent !== false) {
+                        imagefilledrectangle($dst, 0, 0, $nw, $nh, $transparent);
+                    }
                 }
                 imagecopyresampled($dst, $src, 0, 0, 0, 0, $nw, $nh, $w, $h);
                 imagedestroy($src);
                 $src = $dst;
             }
 
-            if (function_exists('imagewebp')) {
+            if (function_exists('imagewebp') && !$keepPngAlpha) {
                 $webpName = pathinfo($newName, PATHINFO_FILENAME) . '.webp';
                 $webpPath = $targetReal . DIRECTORY_SEPARATOR . $webpName;
                 if (@imagewebp($src, $webpPath, 82)) {
@@ -143,7 +155,7 @@ function upload_image(array $file, string $folder, ?string $oldFile = null): arr
 
 function delete_upload(string $folder, string $file): void
 {
-    $allowedFolders = ['dishes', 'categories', 'gallery', 'settings', 'pages'];
+    $allowedFolders = ['dishes', 'categories', 'gallery', 'settings', 'pages', 'banners'];
     if (!in_array($folder, $allowedFolders, true)) {
         return;
     }

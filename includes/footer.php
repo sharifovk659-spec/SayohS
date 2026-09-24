@@ -212,7 +212,7 @@ $footerLogoUrl = is_file($footerLogoAsset) ? asset('images/brand/sayoh-logo.png'
           'addressLocality' => 'Dushanbe',
           'addressCountry' => 'TJ',
       ],
-      'url' => rtrim(base_url(), '/') . '/',
+      'url' => absolute_url(),
       'servesCuisine' => 'Чайхана, среднеазиатская',
       'priceRange' => '$$',
   ];

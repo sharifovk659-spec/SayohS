@@ -24,6 +24,8 @@ return [
     'tiktok' => 'https://tiktok.com/',
     'telegram' => 'https://t.me/',
     'base_url' => '',
+    // Optional canonical domain override (e.g. https://sayoh-s-jekq.vercel.app). Leave empty to auto-detect from the request.
+    'public_url' => '',
     'timezone' => 'Asia/Dushanbe',
     'upload_max_mb' => 3,
     'about_video_url' => 'https://www.youtube.com/embed/ScMzIvxBSi4?rel=0',

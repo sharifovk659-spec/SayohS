@@ -36,3 +36,11 @@
 4. Доменро ба папка пайваст кунед
 
 Муфассал: [INSTALL.md](INSTALL.md) · [DEPLOY_HOSTINGER.md](DEPLOY_HOSTINGER.md)
+
+## Доработка → Deploy (Vercel)
+
+1. **Локал:** `start-local.bat` → http://127.0.0.1:8080/
+2. Тағйирот дар `Aroma-Restarant`, санҷиш дар браузер
+3. **Git:** `git add` / `git commit` / `git push` → репо [SayohS](https://github.com/sharifovk659-spec/SayohS)
+4. Vercel аз `main` автомат deploy мекунад → https://sayoh-s-jekq.vercel.app/
+5. Агар MySQL дур аст: `database/migrations/20260924_sayoh_branding.sql` — барои ивази matни «Aroma» ба «Сайёх»

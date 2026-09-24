@@ -16,7 +16,7 @@ if ($slug === '' && isset($_GET['id'])) {
 $dish = $slug !== '' ? find_dish_by_slug($slug) : null;
 if (!$dish) {
     http_response_code(404);
-    $pageTitle = 'Блюдо не найдено — Aroma';
+    $pageTitle = 'Блюдо не найдено — ' . site_brand_short();
     $pageDescription = 'Запрашиваемое блюдо не найдено в меню.';
     $bodyClass = 'page-404';
     require __DIR__ . '/includes/header.php';

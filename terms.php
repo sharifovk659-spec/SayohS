@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/includes/init.php';
 
-$pageTitle = 'Пользовательское соглашение — Aroma';
-$pageDescription = 'Пользовательское соглашение сайта Aroma Restaurant.';
+$pageTitle = 'Пользовательское соглашение — ' . site_brand_short();
+$pageDescription = 'Пользовательское соглашение сайта ' . site_brand_full() . '.';
 $bodyClass = 'page-legal';
 
 require __DIR__ . '/includes/header.php';
@@ -22,7 +22,7 @@ require __DIR__ . '/includes/header.php';
 
 <section class="section">
   <div class="container legal-content">
-    <p>Используя сайт Aroma Restaurant, вы соглашаетесь с правилами бронирования и публикации информации.</p>
+    <p>Используя сайт <?= e(site_brand_full()) ?>, вы соглашаетесь с правилами бронирования и публикации информации.</p>
     <h2>Бронирование</h2>
     <p>Заявка на сайте не гарантирует автоматическое подтверждение стола. Окончательное подтверждение делает администратор.</p>
     <h2>Контент</h2>

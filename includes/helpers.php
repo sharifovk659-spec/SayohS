@@ -5,6 +5,31 @@ declare(strict_types=1);
 /**
  * Detect install path from DOCUMENT_ROOT vs project root (e.g. /Restarant or '').
  */
+function site_brand_full(): string
+{
+    return (string) (app_config('full_name') ?: app_config('name') ?: 'Чайхана Сайёх');
+}
+
+function site_brand_short(): string
+{
+    return (string) (app_config('name') ?: 'Сайёх');
+}
+
+/** Replace legacy Aroma labels in DB-backed copy with current Sayoh branding. */
+function localize_brand_string(string $text): string
+{
+    if ($text === '') {
+        return $text;
+    }
+    $full = site_brand_full();
+    $short = site_brand_short();
+    return str_replace(
+        ['Aroma Restaurant', 'Aroma'],
+        [$full, $short],
+        $text
+    );
+}
+
 function detect_base_path(): string
 {
     static $detected = null;
@@ -24,27 +49,93 @@ function detect_base_path(): string
     return $detected;
 }
 
+function request_host_name(): string
+{
+    $host = strtolower((string) ($_SERVER['HTTP_HOST'] ?? 'localhost'));
+    return preg_replace('/:\d+$/', '', $host) ?? $host;
+}
+
 function is_production_host(): bool
 {
-    $host = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
-    return $host === 'aroma.inovaauto.com';
+    return request_host_name() === 'aroma.inovaauto.com';
+}
+
+function url_matches_current_host(string $url): bool
+{
+    if (!str_starts_with($url, 'http://') && !str_starts_with($url, 'https://')) {
+        return true;
+    }
+    $host = parse_url($url, PHP_URL_HOST);
+    if (!is_string($host) || $host === '') {
+        return false;
+    }
+    return strcasecmp($host, request_host_name()) === 0;
+}
+
+function request_is_https(): bool
+{
+    return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower((string) $_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https')
+        || (isset($_SERVER['SERVER_PORT']) && (string) $_SERVER['SERVER_PORT'] === '443')
+        || (getenv('VERCEL') !== false);
+}
+
+/**
+ * Site root for links: relative path (/Restarant) or absolute URL only when it matches the current host.
+ */
+function pick_configured_base(): string
+{
+    $candidates = [];
+
+    if (function_exists('setting')) {
+        $fromDb = setting('base_url');
+        if (is_string($fromDb) && $fromDb !== '') {
+            $candidates[] = rtrim($fromDb, '/');
+        }
+    }
+
+    $cfgBase = rtrim((string) app_config('base_url', ''), '/');
+    if ($cfgBase !== '') {
+        $candidates[] = $cfgBase;
+    }
+
+    foreach (['APP_URL', 'SITE_URL', 'PUBLIC_URL'] as $envKey) {
+        $val = getenv($envKey);
+        if (is_string($val) && trim($val) !== '') {
+            $candidates[] = rtrim(trim($val), '/');
+        }
+    }
+
+    $vercelUrl = getenv('VERCEL_URL');
+    if (is_string($vercelUrl) && $vercelUrl !== '') {
+        $candidates[] = 'https://' . ltrim(strtolower($vercelUrl), '/');
+    }
+
+    foreach ($candidates as $base) {
+        if (str_starts_with($base, 'http://') || str_starts_with($base, 'https://')) {
+            if (url_matches_current_host($base)) {
+                return $base;
+            }
+            continue;
+        }
+        return $base;
+    }
+
+    if (is_production_host()) {
+        return 'https://aroma.inovaauto.com';
+    }
+
+    $detected = detect_base_path();
+    if ($detected !== '') {
+        return $detected;
+    }
+
+    return '';
 }
 
 function base_url(string $path = ''): string
 {
-    $fromDb = function_exists('setting') ? setting('base_url') : null;
-    if (is_string($fromDb) && $fromDb !== '') {
-        $base = rtrim($fromDb, '/');
-    } elseif (is_production_host()) {
-        // Subdomain document root — never fall back to local /Restarant.
-        $base = 'https://aroma.inovaauto.com';
-    } else {
-        // Local XAMPP: detect /Restarant; otherwise use config/app.php.
-        $detected = detect_base_path();
-        $base = $detected !== ''
-            ? $detected
-            : rtrim((string) app_config('base_url', ''), '/');
-    }
+    $base = pick_configured_base();
 
     $path = ltrim($path, '/');
     if ($path === '') {
@@ -64,6 +155,25 @@ function base_url(string $path = ''): string
     return $base . '/' . $path;
 }
 
+function absolute_url(string $path = ''): string
+{
+    $rel = base_url($path);
+    if (str_starts_with($rel, 'http://') || str_starts_with($rel, 'https://')) {
+        if (request_is_https() && str_starts_with($rel, 'http://')) {
+            return 'https://' . substr($rel, 7);
+        }
+        return $rel;
+    }
+
+    $scheme = request_is_https() ? 'https' : 'http';
+    $host = (string) ($_SERVER['HTTP_HOST'] ?? 'localhost');
+    if ($rel === '/') {
+        return $scheme . '://' . $host . '/';
+    }
+
+    return $scheme . '://' . $host . $rel;
+}
+
 function asset(string $path): string
 {
     $rel = ltrim($path, '/');
@@ -79,6 +189,24 @@ function asset(string $path): string
 function upload_url(string $folder, string $file): string
 {
     return base_url('uploads/' . trim($folder, '/') . '/' . rawurlencode($file));
+}
+
+function home_banner_image_url(?string $file, string $fallbackAsset = 'banner/mobile-hero-salmon.png'): string
+{
+    if (is_string($file) && $file !== '') {
+        $upload = __DIR__ . '/../uploads/banners/' . basename($file);
+        if (is_file($upload)) {
+            return upload_url('banners', basename($file));
+        }
+    }
+
+    $fallback = ltrim($fallbackAsset, '/');
+    $assetPath = __DIR__ . '/../assets/images/' . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $fallback);
+    if (is_file($assetPath)) {
+        return asset('images/' . $fallback);
+    }
+
+    return asset('images/banner/mobile-hero-salmon.png');
 }
 
 function e(?string $value): string
@@ -116,14 +244,6 @@ function redirect(string $path): never
 function format_price(float|string $price): string
 {
     return number_format((float) $price, 0, ',', ' ') . ' ₽';
-}
-
-function request_is_https(): bool
-{
-    return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-        || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower((string) $_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https')
-        || (isset($_SERVER['SERVER_PORT']) && (string) $_SERVER['SERVER_PORT'] === '443')
-        || (getenv('VERCEL') !== false);
 }
 
 function csrf_token(): string

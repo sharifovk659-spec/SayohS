@@ -26,4 +26,4 @@ Disallow: /sql/
 Disallow: /account/
 Disallow: /api/
 
-Sitemap: https://aroma.inovaauto.com/sitemap.php
+Sitemap: https://sayoh-s-jekq.vercel.app/sitemap.php

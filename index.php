@@ -9,10 +9,14 @@ $pageDescription = $app['description'];
 $bodyClass = 'page-home';
 
 $heroPage = apply_page_translation(fetch_page('home_hero'));
-$heroTitle = translated_setting('hero_title')
-    ?: (string) ($heroPage['title'] ?? ($app['full_name'] ?? $app['name']));
-$heroText = translated_setting('hero_text')
-    ?: (string) ($heroPage['content'] ?? __('popular_text'));
+$heroTitle = localize_brand_string(
+    translated_setting('hero_title')
+        ?: (string) ($heroPage['title'] ?? ($app['full_name'] ?? $app['name']))
+);
+$heroText = localize_brand_string(
+    translated_setting('hero_text')
+        ?: (string) ($heroPage['content'] ?? __('popular_text'))
+);
 $heroEyebrow = __('hero_welcome');
 
 $bannerDir = __DIR__ . '/assets/images/banner/';
@@ -38,10 +42,103 @@ $galleryPreview = fetch_gallery(null, 6);
 $redirectTo = 'index.php';
 $formId = 'home-reservation';
 
+$mobileHeroSlides = [
+    [
+        'label' => __('hero_mb_label_1'),
+        'title' => __('hero_mb_title_1'),
+        'sub' => __('hero_mb_sub_1'),
+        'img' => home_banner_image_url(null, 'banner/mobile-hero-salmon.png'),
+        'alt' => __('hero_mb_title_1'),
+    ],
+    [
+        'label' => __('hero_mb_label_2'),
+        'title' => __('hero_mb_title_2'),
+        'sub' => __('hero_mb_sub_2'),
+        'img' => $heroPlateSrc,
+        'alt' => $heroTitle,
+    ],
+    [
+        'label' => __('hero_mb_label_3'),
+        'title' => __('hero_mb_title_3'),
+        'sub' => __('hero_mb_sub_3'),
+        'img' => hero_image_url(setting('hero_image')),
+        'alt' => (string) ($app['full_name'] ?? $app['name']),
+    ],
+    [
+        'label' => __('hero_mb_label_4'),
+        'title' => __('hero_mb_title_4'),
+        'sub' => __('hero_mb_sub_4'),
+        'img' => home_banner_image_url(null, 'banner/mobile-hero-salmon.png'),
+        'alt' => __('hero_mb_title_4'),
+    ],
+];
+
+$dbMobileBanners = fetch_home_banners(true);
+if ($dbMobileBanners !== []) {
+    $mobileHeroSlides = [];
+    foreach ($dbMobileBanners as $i => $bannerRow) {
+        $fallback = [
+            'banner/mobile-hero-salmon.png',
+            'banner/plate-cut.png',
+            'hero/hero-main.webp',
+            'banner/mobile-hero-salmon.png',
+        ];
+        $fallbackPath = $fallback[$i] ?? $fallback[0];
+        $titleText = trim((string) ($bannerRow['title'] ?? ''));
+        $mobileHeroSlides[] = [
+            'label' => trim((string) ($bannerRow['label'] ?? '')) ?: __('hero_mb_label_1'),
+            'title' => $titleText !== '' ? $titleText : __('hero_mb_title_1'),
+            'sub' => trim((string) ($bannerRow['subtitle'] ?? '')) ?: __('hero_mb_sub_1'),
+            'img' => home_banner_image_url($bannerRow['image'] ?? null, $fallbackPath),
+            'alt' => $titleText !== '' ? $titleText : __('hero_mb_title_1'),
+        ];
+    }
+}
+
 require __DIR__ . '/includes/header.php';
 ?>
 
 <section class="hero hero--premium" aria-label="<?= e($heroTitle) ?>">
+  <div class="hero-mobile-banner" data-hero-mobile-banner>
+    <div class="hero-mobile-banner__viewport" data-hero-mobile-carousel>
+      <?php foreach ($mobileHeroSlides as $i => $slide): ?>
+      <article
+        class="hero-mobile-banner__slide<?= $i === 0 ? ' is-active' : '' ?>"
+        data-hero-slide="<?= (int) $i ?>"
+        aria-hidden="<?= $i === 0 ? 'false' : 'true' ?>"
+      >
+        <div class="hero-mobile-banner__inner">
+          <div class="hero-mobile-banner__copy">
+            <p class="hero-mobile-banner__label"><span class="hero-mobile-banner__label-line" aria-hidden="true"></span><?= e($slide['label']) ?></p>
+            <h2 class="hero-mobile-banner__title"><?= e($slide['title']) ?></h2>
+            <p class="hero-mobile-banner__sub"><?= e($slide['sub']) ?></p>
+            <a class="hero-mobile-banner__cta" href="<?= e(base_url('menu.php')) ?>">
+              <?= e(__('hero_menu_btn')) ?>
+              <span aria-hidden="true">→</span>
+            </a>
+          </div>
+          <div class="hero-mobile-banner__media">
+            <img src="<?= e($slide['img']) ?>" alt="<?= e($slide['alt']) ?>" width="220" height="200" loading="<?= $i === 0 ? 'eager' : 'lazy' ?>" decoding="async">
+          </div>
+        </div>
+      </article>
+      <?php endforeach; ?>
+    </div>
+    <div class="hero-mobile-banner__dots" role="tablist" aria-label="<?= e(__('hero_mb_dots_aria')) ?>">
+      <?php foreach ($mobileHeroSlides as $i => $_slide): ?>
+      <button
+        type="button"
+        class="hero-mobile-banner__dot<?= $i === 0 ? ' is-active' : '' ?>"
+        data-hero-dot="<?= (int) $i ?>"
+        role="tab"
+        aria-selected="<?= $i === 0 ? 'true' : 'false' ?>"
+        aria-label="<?= e(sprintf(__('hero_mb_dot_aria'), $i + 1, count($mobileHeroSlides))) ?>"
+      ></button>
+      <?php endforeach; ?>
+    </div>
+  </div>
+
+  <div class="hero-desktop-only">
   <div class="hero-ambient" aria-hidden="true"></div>
 
   <div class="hero-decor" aria-hidden="true">
@@ -106,6 +203,7 @@ require __DIR__ . '/includes/header.php';
       <img class="hero-stage-leaf hero-stage-leaf--2" src="<?= e($decorBasil) ?>" alt="" width="120" height="120" aria-hidden="true">
       <img class="hero-stage-pepper" src="<?= e($decorPepperScatter) ?>" alt="" width="160" height="110" aria-hidden="true">
     </div>
+  </div>
   </div>
 </section>
 

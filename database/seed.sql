@@ -46,33 +46,33 @@ INSERT INTO gallery (title, image, type, sort_order, is_active) VALUES
 ('Сервировка стола', 'gal-table.webp', 'interior', 8, 1);
 
 INSERT INTO pages (page_key, title, subtitle, content, image, video_url, meta_title, meta_description) VALUES
-('home_hero', 'Aroma Restaurant', 'Добро пожаловать', 'Авторская кухня, свежие ингредиенты и атмосфера, в которую хочется возвращаться.', 'hero-main.webp', NULL, 'Aroma Restaurant', 'Ресторан Aroma — авторская кухня и тёплая атмосфера.'),
-('about', 'Добро пожаловать в Aroma', 'О нас', 'Мы объединяем свежие продукты, современную подачу и внимательный сервис, чтобы каждый визит оставлял приятные впечатления.\n\nСвежие продукты\nВысокое качество\nЛюбовь к деталям', 'about-preview.webp', 'https://www.youtube.com/embed/ScMzIvxBSi4?rel=0', 'О ресторане Aroma', 'История и философия ресторана Aroma.'),
-('contacts', 'Контакты', 'Свяжитесь с нами', 'Напишите нам или позвоните — ответим по брони, меню и мероприятиям.', NULL, NULL, 'Контакты Aroma', 'Адрес, телефон и форма связи ресторана Aroma.');
+('home_hero', 'Чайхана Сайёх', 'Добро пожаловать', 'Самая большая чайхана в городе. Доставка и бронь столов.', 'hero-main.webp', NULL, 'Чайхана Сайёх', 'Чайхана Сайёх — доставка, меню и бронь столов.'),
+('about', 'Добро пожаловать в Чайхана Сайёх', 'О нас', 'Мы объединяем свежие продукты, современную подачу и внимательный сервис, чтобы каждый визит оставлял приятные впечатления.\n\nСвежие продукты\nВысокое качество\nЛюбовь к деталям', 'about-preview.webp', 'https://www.youtube.com/embed/ScMzIvxBSi4?rel=0', 'О чайхане Сайёх', 'История и атмосфера чайханы Сайёх.'),
+('contacts', 'Контакты', 'Свяжитесь с нами', 'Напишите нам или позвоните — ответим по брони, меню и мероприятиям.', NULL, NULL, 'Контакты Сайёх', 'Адрес, телефон и форма связи чайханы Сайёх.');
 
 INSERT INTO settings (setting_key, setting_value, setting_type) VALUES
-('restaurant_name', 'Aroma', 'string'),
-('restaurant_full_name', 'Aroma Restaurant', 'string'),
-('tagline', 'Изысканная кухня в атмосфере тепла', 'string'),
-('phone', '+7 (495) 123-45-67', 'string'),
-('phone_href', '+74951234567', 'string'),
-('email', 'hello@aroma-rest.ru', 'string'),
-('whatsapp', 'https://wa.me/74951234567', 'string'),
-('address', 'Москва, ул. Тверская, 18', 'string'),
-('map_url', 'https://yandex.ru/maps/?text=Москва%2C%20ул.%20Тверская%2C%2018', 'string'),
-('map_embed', 'https://yandex.ru/map-widget/v1/?text=Москва%2C%20ул.%20Тверская%2C%2018&z=16', 'string'),
+('restaurant_name', 'Сайёх', 'string'),
+('restaurant_full_name', 'Чайхана Сайёх', 'string'),
+('tagline', 'Самая большая чайхана в городе', 'string'),
+('phone', '+992 98 986 0007', 'string'),
+('phone_href', '+992989860007', 'string'),
+('email', 'hello@sayoh-chaykhana.tj', 'string'),
+('whatsapp', 'https://wa.me/992989860007', 'string'),
+('address', 'Автовокзал', 'string'),
+('map_url', 'https://yandex.ru/maps/?text=Автовокзал', 'string'),
+('map_embed', 'https://yandex.ru/map-widget/v1/?text=Автовокзал&z=15', 'string'),
 ('base_url', '', 'string'),
 ('rating', '4.9', 'string'),
 ('guests_count_label', '5000+', 'string'),
 ('reviews_count_label', '1200+', 'string'),
-('hero_title', 'Aroma Restaurant', 'string'),
+('hero_title', 'Чайхана Сайёх', 'string'),
 ('hero_text', 'Авторская кухня, свежие ингредиенты и атмосфера, в которую хочется возвращаться.', 'string'),
 ('hero_image', 'hero-main.webp', 'string'),
 ('about_video_url', 'https://www.youtube.com/embed/ScMzIvxBSi4?rel=0', 'string'),
-('meta_title_default', 'Aroma Restaurant', 'string'),
-('meta_description_default', 'Aroma Restaurant — авторская кухня, свежие ингредиенты и тёплая атмосфера.', 'string'),
+('meta_title_default', 'Чайхана Сайёх', 'string'),
+('meta_description_default', 'Чайхана Сайёх — самая большая чайхана в городе. Доставка и бронь столов.', 'string'),
 ('notify_email', '', 'string'),
-('timezone', 'Europe/Moscow', 'string');
+('timezone', 'Asia/Dushanbe', 'string');
 
 INSERT INTO opening_hours (day_number, day_name, time_from, time_to, is_closed, sort_order) VALUES
 (1, 'Понедельник', '12:00:00', '23:00:00', 0, 1),

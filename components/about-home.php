@@ -8,9 +8,11 @@ $videoUrl = (string) (
     ($aboutPage['video_url'] ?? null)
     ?: get_setting('about_video_url', (string) app_config('about_video_url', ''))
 );
-$aboutTitle = (string) ($aboutPage['title'] ?? 'Добро пожаловать в Aroma');
-$aboutEyebrow = (string) ($aboutPage['subtitle'] ?? __('nav_about'));
-$aboutContent = (string) ($aboutPage['content'] ?? '');
+$aboutTitle = localize_brand_string(
+    (string) ($aboutPage['title'] ?? ('Добро пожаловать в ' . site_brand_full()))
+);
+$aboutEyebrow = localize_brand_string((string) ($aboutPage['subtitle'] ?? __('nav_about')));
+$aboutContent = localize_brand_string((string) ($aboutPage['content'] ?? ''));
 $aboutImage = (string) ($aboutPage['image'] ?? 'about-interior.webp');
 if (!is_file(__DIR__ . '/../assets/images/hero/about-interior.webp') && !is_file(__DIR__ . '/../assets/images/hero/about-interior.jpg')) {
     $aboutImage = 'about-preview.webp';

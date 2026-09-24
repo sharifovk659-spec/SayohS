@@ -601,6 +601,62 @@ function fetch_page(string $pageKey): ?array
 }
 
 /**
+ * @return list<array<string, mixed>>
+ */
+function fetch_home_banners(bool $activeOnly = true): array
+{
+    static $cache = null;
+    if (is_array($cache)) {
+        return $cache;
+    }
+
+    if (!db_available()) {
+        $cache = [];
+        return $cache;
+    }
+
+    try {
+        $sql = 'SELECT id, sort_order, is_active, label, title, subtitle, image
+                FROM home_banners';
+        if ($activeOnly) {
+            $sql .= ' WHERE is_active = 1';
+        }
+        $sql .= ' ORDER BY sort_order ASC, id ASC LIMIT 12';
+        $stmt = db()->query($sql);
+        $rows = $stmt->fetchAll();
+        $cache = is_array($rows) ? $rows : [];
+    } catch (Throwable $e) {
+        storage_log('fetch_home_banners: ' . $e->getMessage());
+        $cache = [];
+    }
+
+    return $cache;
+}
+
+/**
+ * @return array<string, mixed>|null
+ */
+function fetch_home_banner(int $id): ?array
+{
+    if ($id <= 0 || !db_available()) {
+        return null;
+    }
+
+    try {
+        $stmt = db()->prepare(
+            'SELECT id, sort_order, is_active, label, title, subtitle, image
+             FROM home_banners WHERE id = :id LIMIT 1'
+        );
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch();
+        return $row ?: null;
+    } catch (Throwable $e) {
+        storage_log('fetch_home_banner: ' . $e->getMessage());
+        return null;
+    }
+}
+
+/**
  * Convert TIME / H:i string to minutes from midnight.
  */
 function time_to_minutes(string $time): int

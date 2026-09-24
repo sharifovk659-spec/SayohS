@@ -7,17 +7,8 @@ require_once __DIR__ . '/includes/init.php';
 header('Content-Type: application/xml; charset=UTF-8');
 
 $base = rtrim((string) app_config('public_url', ''), '/');
-if ($base === '') {
-    $candidate = rtrim(base_url(), '/');
-    if (str_starts_with($candidate, 'http://') || str_starts_with($candidate, 'https://')) {
-        $base = $candidate;
-    } else {
-        $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-            || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower((string) $_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https');
-        $scheme = $https ? 'https' : 'http';
-        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-        $base = $scheme . '://' . $host . $candidate;
-    }
+if ($base === '' || !url_matches_current_host($base)) {
+    $base = rtrim(absolute_url(), '/');
 }
 
 $static = [

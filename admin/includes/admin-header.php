@@ -9,7 +9,7 @@ $adminPageTitle = $adminPageTitle ?? 'Админ-панель';
 $adminActive = $adminActive ?? '';
 $admin = admin_user();
 $flash = get_flash();
-$brand = setting('restaurant_name', (string) app_config('name', 'Aroma')) ?? 'Aroma';
+$brand = setting('restaurant_name', (string) app_config('name', site_brand_short())) ?? site_brand_short();
 $adminName = (string) ($_SESSION['admin']['name'] ?? $admin['name'] ?? 'Админ');
 ?>
 <!DOCTYPE html>

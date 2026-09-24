@@ -6,7 +6,7 @@ declare(strict_types=1);
 /** @var string $brand */
 
 $adminActive = $adminActive ?? '';
-$brand = $brand ?? (setting('restaurant_name', (string) app_config('name', 'Aroma')) ?? 'Aroma');
+$brand = $brand ?? (setting('restaurant_name', (string) app_config('name', site_brand_short())) ?? site_brand_short());
 
 $nav = [
     'dashboard' => ['Обзор', 'admin/index.php'],
@@ -17,6 +17,7 @@ $nav = [
     'customers' => ['Клиенты', 'admin/customers/index.php'],
     'favorites-stats' => ['Избранное', 'admin/favorites/index.php'],
     'gallery' => ['Галерея', 'admin/gallery/index.php'],
+    'banners' => ['Баннер (моб.)', 'admin/banners/index.php'],
     'pages' => ['Страницы', 'admin/pages/index.php'],
     'translations' => ['Переводы', 'admin/translations/index.php'],
     'messages' => ['Сообщения', 'admin/messages/index.php'],
